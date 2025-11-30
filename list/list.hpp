@@ -15,23 +15,18 @@ namespace dde{
 template<typename Tp>
 struct S_DATA{
     Tp val;
-    S_DATA *back;
-    S_DATA *next;
+    S_DATA *back = nullptr;
+    S_DATA *next = nullptr;
 };
 
 template<typename Tp>
 class list{
-    S_DATA<Tp>   *p_data;
-    unsigned long p_size;
+    S_DATA<Tp>   *p_data = nullptr;
+    unsigned long p_size = 0;
 public:
     
-    list(){
-        this->p_data = new S_DATA<Tp>;
-        this->p_size = 0;
-    }
-    
-    list(std::initializer_list<Tp> _list) : list(){
-        this->p_size = _list.size();
+    list() = default;
+    list(std::initializer_list<Tp> _list) : p_size(_list.size()), p_data(new S_DATA<Tp>()){
         this->InitList(_list);
     }
     
@@ -46,9 +41,10 @@ public:
     
 private:
     void InitList(std::initializer_list<Tp> &list){
-        S_DATA<Tp> *buffer = this->p_data;
-        if (buffer != nullptr){
+        if (this->p_data != nullptr && list.size() != 0){
+            S_DATA<Tp> *buffer = this->p_data;
             unsigned long size = 0;
+            
             std::ranges::for_each(list.begin(), list.end(), [&buffer, &list, &size](Tp t){
                 size++;
                 buffer->val = t;
@@ -58,6 +54,7 @@ private:
                     buffer = buffer->next;
                 }
             });
+
         }
     }
 };
