@@ -9,6 +9,7 @@
 #define list_hpp
 #include <initializer_list>
 #include <ranges>
+#include <vector>
 
 namespace dde{
 
@@ -23,6 +24,7 @@ template<typename Tp>
 class list{
     S_DATA<Tp>   *p_data = nullptr;
     unsigned long p_size = 0;
+    std::vector<S_DATA<Tp>*> p_Veclist;
 public:
     
     list() = default;
@@ -39,6 +41,15 @@ public:
         }
     }
     
+    S_DATA<Tp> *begin(){
+        return this->p_Veclist.at(0);
+    }
+    
+    S_DATA<Tp> *end(){
+        return this->p_Veclist.at(this->p_Veclist.size() -1);
+    }
+    
+    
 private:
     void InitList(std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
@@ -54,7 +65,27 @@ private:
                     buffer = buffer->next;
                 }
             });
-
+            this->UpdatePointersList(this->p_data);
+        }
+    }
+    
+    void UpdatePointersList(S_DATA<Tp> *data){
+        if (data != nullptr){
+            if (!this->p_Veclist.empty()){
+                this->p_Veclist.clear();
+            }
+            
+            S_DATA<Tp> *buff = data;
+            
+            this->p_Veclist.push_back(data);
+            for (int i = 0; i < this->p_size; i++){
+                if (this->p_Veclist[i]->next != nullptr){
+                    this->p_Veclist.push_back(this->p_Veclist[i]->next);
+                }
+                else{
+                    break;
+                }
+            }
         }
     }
 };
