@@ -21,11 +21,37 @@ struct S_DATA{
 };
 
 template<typename Tp>
+class Iterator{
+    S_DATA<Tp> *p_data = nullptr;
+public:
+    
+    Iterator() = default;
+    Iterator(S_DATA<Tp> *data){
+        this->p_data = data;
+    }
+
+    Tp &operator* (){
+        return this->p_data->val;
+    }
+    
+    void operator++ (int a){
+        if (this->p_data != nullptr){
+            this->p_data = this->p_data->next;
+        }
+    }
+    
+    bool operator!= (const Iterator<Tp> &it){
+        return this->p_data != it.p_data;
+    }
+    
+};
+
+template<typename Tp>
 class list{
     S_DATA<Tp>   *p_data = nullptr;
     unsigned long p_size = 0;
-    std::vector<S_DATA<Tp>*> p_Veclist;
 public:
+    using iterator = Iterator<Tp>;
     
     list() = default;
     list(std::initializer_list<Tp> _list) : p_size(_list.size()), p_data(new S_DATA<Tp>()){
@@ -41,14 +67,13 @@ public:
         }
     }
     
-    S_DATA<Tp> *begin(){
-        return this->p_Veclist.at(0);
+    iterator begin(){
+        return this->p_data;
     }
     
-    S_DATA<Tp> *end(){
-        return this->p_Veclist.at(this->p_Veclist.size() -1);
+    iterator end(){
+        return this->Jump(this->p_size);
     }
-    
     
 private:
     void InitList(std::initializer_list<Tp> &list){
@@ -65,28 +90,15 @@ private:
                     buffer = buffer->next;
                 }
             });
-            this->UpdatePointersList(this->p_data);
         }
     }
     
-    void UpdatePointersList(S_DATA<Tp> *data){
-        if (data != nullptr){
-            if (!this->p_Veclist.empty()){
-                this->p_Veclist.clear();
-            }
-            
-            S_DATA<Tp> *buff = data;
-            
-            this->p_Veclist.push_back(data);
-            for (int i = 0; i < this->p_size; i++){
-                if (this->p_Veclist[i]->next != nullptr){
-                    this->p_Veclist.push_back(this->p_Veclist[i]->next);
-                }
-                else{
-                    break;
-                }
-            }
+    S_DATA<Tp> *Jump(unsigned long pos){
+        S_DATA<Tp> *data = this->p_data;
+        for (unsigned long i = 0; i < ((pos > this->p_size) ? this->p_size : pos); i++){
+            data = data->next;
         }
+        return data;
     }
 };
 
