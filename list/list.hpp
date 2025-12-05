@@ -40,6 +40,12 @@ public:
         }
     }
     
+    void operator-- (int a){
+        if (this->p_data != nullptr){
+            this->p_data = this->p_data->back;
+        }
+    }
+    
     bool operator!= (const Iterator<Tp> &it){
         return this->p_data != it.p_data;
     }
