@@ -54,53 +54,61 @@ public:
 
 template<typename Tp>
 class list{
-    S_DATA<Tp>   *p_data = nullptr;
-    unsigned long p_size = 0;
 public:
-    using iterator = Iterator<Tp>;
+    using iterator   = Iterator<Tp>;
+    using ListStruct = S_DATA<Tp>;
+    using u_long     = unsigned long;
     
+private:
+    ListStruct   *p_data      = nullptr;
+    u_long        p_size      = 0;
+    
+public:
     list() = default;
-    list(std::initializer_list<Tp> _list) : p_size(_list.size()), p_data(new S_DATA<Tp>()){
+    list(std::initializer_list<Tp> _list) : p_size(_list.size()), p_data(new ListStruct()){
         this->InitList(_list);
     }
     
     ~list(){
-        S_DATA<Tp> *buffer = this->p_data;
-        while(buffer != nullptr){
-            S_DATA<Tp> *buff = buffer->next;
-            delete buffer;
-            buffer = buff;
+        ListStruct *dat_next = this->p_data->next;
+        this->p_data->back = nullptr;
+        this->p_data->next = nullptr;
+        
+        while(dat_next != nullptr){
+            ListStruct *buff = dat_next->next;
+            delete dat_next;
+            dat_next = buff;
         }
     }
     
     iterator begin(){
-        return this->p_data;
+        return this->p_data->next;
     }
     
     iterator end(){
-        return this->Jump(this->p_size);
+        return this->p_data;
     }
     
 private:
     void InitList(std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
-            S_DATA<Tp> *buffer = this->p_data;
-            unsigned long size = 0;
-            
-            std::ranges::for_each(list.begin(), list.end(), [&buffer, &list, &size](Tp t){
-                size++;
-                buffer->val = t;
-                if (size < list.size()){
-                    buffer->next = new S_DATA<Tp>{};
-                    buffer->next->back = buffer;
-                    buffer = buffer->next;
-                }
+            ListStruct *buffer = this->p_data;
+            std::ranges::for_each(list.begin(), list.end(), [this](Tp t){
+                this->p_data->next = new ListStruct();
+                this->p_data->next->val = t;
+                this->p_data->next->back = this->p_data;
+                this->p_data = this->p_data->next;
             });
+            
+            buffer->back = this->p_data;
+            this->p_data->next = buffer;
+            this->p_data = this->p_data->next;
+            this->p_size = list.size();
         }
     }
     
     S_DATA<Tp> *Jump(unsigned long pos){
-        S_DATA<Tp> *data = this->p_data;
+        ListStruct *data = this->p_data;
         for (unsigned long i = 0; i < ((pos > this->p_size) ? this->p_size : pos); i++){
             data = data->next;
         }
