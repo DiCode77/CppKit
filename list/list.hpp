@@ -50,6 +50,9 @@ public:
         return this->p_data != it.p_data;
     }
     
+    S_DATA<Tp> *get(){
+        return this->p_data;
+    }
 };
 
 template<typename Tp>
@@ -115,6 +118,15 @@ private:
         return data;
     }
 };
+
+template<typename Tp>
+void advance(Iterator<Tp> &it, int n){
+    S_DATA<Tp> *data = it.get();
+    for (int i = 0; i < n; i++){
+        data = data->next;
+    }
+    *it.get() = *data;
+}
 
 }
 
