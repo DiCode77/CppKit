@@ -67,8 +67,13 @@ private:
     u_long        p_size      = 0;
     
 public:
-    list() = default;
-    list(std::initializer_list<Tp> _list) : p_size(_list.size()), p_data(new ListStruct()){
+    list(){
+        this->p_data = new ListStruct();
+        this->p_data = 0;
+    }
+    
+    list(std::initializer_list<Tp> _list) : list(){
+        this->p_size = _list.size();
         this->InitList(_list);
     }
     
@@ -82,6 +87,16 @@ public:
             delete dat_next;
             dat_next = buff;
         }
+    }
+    
+    void insert(iterator it, const Tp &val){
+        ListStruct *old_list = (*it.get())->back;
+        ListStruct *new_list = new ListStruct();
+        new_list->val = val;
+        new_list->next = *it.get();
+        new_list->next->back = new_list;
+        new_list->back = old_list;
+        old_list->next = new_list;
     }
     
     iterator begin(){
