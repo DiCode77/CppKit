@@ -18,6 +18,11 @@ struct S_DATA{
     Tp val;
     S_DATA *back = nullptr;
     S_DATA *next = nullptr;
+    
+    S_DATA() : back(this), next(this), val(Tp{}){}
+    S_DATA(S_DATA *dat1, S_DATA *dat2, Tp Tdat = Tp{}) : back(dat1), next(dat2), val(Tdat){
+        this->next->back = this;
+    }
 };
 
 template<typename Tp>
@@ -69,7 +74,7 @@ private:
 public:
     list(){
         this->p_data = new ListStruct();
-        this->p_data = 0;
+        this->p_size = 0;
     }
     
     list(std::initializer_list<Tp> _list) : list(){
@@ -110,18 +115,11 @@ public:
 private:
     void InitList(std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
-            ListStruct *buffer = this->p_data;
-            std::ranges::for_each(list.begin(), list.end(), [this](Tp t){
-                this->p_data->next = new ListStruct();
-                this->p_data->next->val = t;
-                this->p_data->next->back = this->p_data;
-                this->p_data = this->p_data->next;
+            ListStruct *listBuff = this->p_data;
+            std::ranges::for_each(list.begin(), list.end(), [this, &listBuff](Tp t){
+                listBuff->next = new ListStruct(listBuff, this->p_data, t);
+                listBuff = listBuff->next;
             });
-            
-            buffer->back = this->p_data;
-            this->p_data->next = buffer;
-            this->p_data = this->p_data->next;
-            this->p_size = list.size();
         }
     }
     
