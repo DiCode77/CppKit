@@ -21,6 +21,7 @@ struct S_DATA{
     
     S_DATA() : back(this), next(this), val(Tp{}){}
     S_DATA(S_DATA *dat1, S_DATA *dat2, Tp Tdat = Tp{}) : back(dat1), next(dat2), val(Tdat){
+        this->back->next = this;
         this->next->back = this;
     }
 };
@@ -102,6 +103,10 @@ public:
         new_list->next->back = new_list;
         new_list->back = old_list;
         old_list->next = new_list;
+    }
+    
+    void push_back(Tp t){
+        new ListStruct(this->p_data->back, this->p_data, t);
     }
     
     iterator begin(){
