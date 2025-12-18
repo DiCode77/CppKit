@@ -107,6 +107,7 @@ public:
     
     void push_back(Tp t){
         new ListStruct(this->p_data->back, this->p_data, t);
+        this->p_size++;
     }
     
     iterator begin(){
@@ -115,6 +116,10 @@ public:
     
     iterator end(){
         return this->p_data;
+    }
+    
+    u_long size() const{
+        return this->p_size;
     }
     
 private:
