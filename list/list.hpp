@@ -40,10 +40,17 @@ public:
         return this->p_data->val;
     }
     
-    void operator++ (int a){
+    void operator++ (int){
         if (this->p_data != nullptr){
             this->p_data = this->p_data->next;
         }
+    }
+    
+    Iterator &operator++ (){
+        if (this->p_data != nullptr){
+            this->p_data = this->p_data->next;
+        }
+        return *this;
     }
     
     void operator-- (int a){
@@ -144,12 +151,9 @@ private:
 
 template<typename Tp>
 void advance(Iterator<Tp> &it, int n){
-    S_DATA<Tp> *data = *it.get();
-    for (int i = 0; i < n; i++){
-        data = data->next;
+    for (int i = 0; i < n; ++i){
+        ++it;
     }
-    
-    *it.get() = data;
 }
 
 }
