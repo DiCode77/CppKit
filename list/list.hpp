@@ -40,10 +40,12 @@ public:
         return this->p_data->val;
     }
     
-    void operator++ (int){
+    Iterator operator++ (int){
+        Iterator tmp = *this;
         if (this->p_data != nullptr){
             this->p_data = this->p_data->next;
         }
+        return tmp;
     }
     
     Iterator &operator++ (){
@@ -59,12 +61,12 @@ public:
         }
     }
     
-    bool operator!= (const Iterator<Tp> &it){
+    bool operator!= (const Iterator<Tp> &it) const{
         return this->p_data != it.p_data;
     }
     
-    S_DATA<Tp> **get(){
-        return &this->p_data;
+    S_DATA<Tp> *get() const{
+        return this->p_data;
     }
 };
 
@@ -102,14 +104,9 @@ public:
         }
     }
     
-    void insert(iterator it, const Tp &val){
-        ListStruct *old_list = (*it.get())->back;
-        ListStruct *new_list = new ListStruct();
-        new_list->val = val;
-        new_list->next = *it.get();
-        new_list->next->back = new_list;
-        new_list->back = old_list;
-        old_list->next = new_list;
+    void insert(iterator &it, const Tp &val){
+        new ListStruct(it.get()->back, it.get(), val);
+        this->p_size++;
     }
     
     void push_back(Tp t){
