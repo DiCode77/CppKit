@@ -135,6 +135,15 @@ public:
         this->p_data = new ListStruct();
     }
     
+    Tp &front(){
+        return this->p_data->next->val;
+    }
+    
+    Tp &back(){
+        return this->p_data->back->val;
+    }
+    
+    
 private:
     void InitList(std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
