@@ -93,15 +93,7 @@ public:
     }
     
     ~list(){
-        ListStruct *dat_next = this->p_data->next;
-        this->p_data->back = nullptr;
-        this->p_data->next = nullptr;
-        
-        while(dat_next != nullptr){
-            ListStruct *buff = dat_next->next;
-            delete dat_next;
-            dat_next = buff;
-        }
+        ClearList();
     }
     
     void insert(iterator &it, const Tp &val){
@@ -126,6 +118,11 @@ public:
         return this->p_size;
     }
     
+    void clear(){
+        this->ClearList();
+        this->p_data = new ListStruct();
+    }
+    
 private:
     void InitList(std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
@@ -143,6 +140,19 @@ private:
             data = data->next;
         }
         return data;
+    }
+    
+    void ClearList(){
+        ListStruct *list = this->p_data->next;
+        this->p_data->back = nullptr;
+        this->p_data->next = nullptr;
+        this->p_size = 0;
+        
+        while (list != nullptr) {
+            ListStruct *list_next = list->next;
+            delete list;
+            list = list_next;
+        }
     }
 };
 
