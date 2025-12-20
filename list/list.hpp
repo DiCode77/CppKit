@@ -87,6 +87,18 @@ public:
         this->p_size = 0;
     }
     
+    list(const u_long size) : list(){
+        for (u_long i = 0; i < size; i++){
+            this->push_back(0);
+        }
+    }
+    
+    list(const u_long size, const Tp init_val) : list(){
+        for (u_long i = 0; i < size; i++){
+            this->push_back(init_val);
+        }
+    }
+    
     list(std::initializer_list<Tp> _list) : list(){
         this->p_size = _list.size();
         this->InitList(_list);
