@@ -135,6 +135,15 @@ public:
         this->p_data = new ListStruct();
     }
     
+    void erase(iterator &it){
+        if (this->p_data != it.get()){
+            ListStruct *node = it.get();
+            node->back->next = node->next;
+            node->next->back = node->back;
+            delete node;
+        }
+    }
+    
     Tp &front(){
         return this->p_data->next->val;
     }
