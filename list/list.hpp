@@ -113,6 +113,11 @@ public:
         this->p_size++;
     }
     
+    void push_front(Tp t){
+        new ListStruct(this->p_data, this->p_data->next, t);
+        this->p_size++;
+    }
+    
     void push_back(Tp t){
         new ListStruct(this->p_data->back, this->p_data, t);
         this->p_size++;
@@ -141,6 +146,7 @@ public:
             node->back->next = node->next;
             node->next->back = node->back;
             delete node;
+            this->p_size--;
         }
     }
     
@@ -150,6 +156,10 @@ public:
     
     Tp &back(){
         return this->p_data->back->val;
+    }
+    
+    bool empty(){
+        return !(this->p_data != this->p_data->next);
     }
     
     
