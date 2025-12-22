@@ -105,7 +105,7 @@ public:
     }
     
     ~list(){
-        ClearList();
+        this->ClearList();
     }
     
     void insert(iterator &it, const Tp &val){
@@ -121,6 +121,18 @@ public:
     void push_back(Tp t){
         new ListStruct(this->p_data->back, this->p_data, t);
         this->p_size++;
+    }
+    
+    void pop_front(){
+        if (this->p_size == 0)
+            return;
+        this->EraseNode(this->p_data->next);
+    }
+    
+    void pop_back(){
+        if (this->p_size == 0)
+            return;
+        this->EraseNode(this->p_data->back);
     }
     
     iterator begin(){
@@ -141,13 +153,7 @@ public:
     }
     
     void erase(iterator &it){
-        if (this->p_data != it.get()){
-            ListStruct *node = it.get();
-            node->back->next = node->next;
-            node->next->back = node->back;
-            delete node;
-            this->p_size--;
-        }
+        this->EraseNode(it);
     }
     
     Tp &front(){
@@ -162,9 +168,18 @@ public:
         return !(this->p_data != this->p_data->next);
     }
     
+    Tp &at(u_long pos){
+        iterator it = this->begin();
+        if (this->p_data != this->p_data->next){
+            for (u_long i = 0; i < pos; i++){
+                it++;
+            }
+        }
+        return *it;
+    }
     
 private:
-    void InitList(std::initializer_list<Tp> &list){
+    void InitList(const std::initializer_list<Tp> &list){
         if (this->p_data != nullptr && list.size() != 0){
             ListStruct *listBuff = this->p_data;
             std::ranges::for_each(list.begin(), list.end(), [this, &listBuff](Tp t){
@@ -172,14 +187,6 @@ private:
                 listBuff = listBuff->next;
             });
         }
-    }
-    
-    S_DATA<Tp> *Jump(unsigned long pos){
-        ListStruct *data = this->p_data;
-        for (unsigned long i = 0; i < ((pos > this->p_size) ? this->p_size : pos); i++){
-            data = data->next;
-        }
-        return data;
     }
     
     void ClearList(){
@@ -192,6 +199,16 @@ private:
             ListStruct *list_next = list->next;
             delete list;
             list = list_next;
+        }
+    }
+    
+    void EraseNode(iterator it){
+        if (this->p_data != it.get()){
+            ListStruct *node = it.get();
+            node->back->next = node->next;
+            node->next->back = node->back;
+            delete node;
+            this->p_size--;
         }
     }
 };
