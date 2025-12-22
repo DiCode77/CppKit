@@ -9,7 +9,6 @@
 #define list_hpp
 #include <initializer_list>
 #include <ranges>
-#include <vector>
 
 namespace dde{
 
@@ -83,7 +82,7 @@ private:
     
 public:
     list(){
-        this->p_data = new ListStruct();
+        this->p_data = this->CreateNode();
         this->p_size = 0;
     }
     
@@ -109,17 +108,17 @@ public:
     }
     
     void insert(iterator &it, const Tp &val){
-        new ListStruct(it.get()->back, it.get(), val);
+        this->CreateNode(it.get()->back, it.get(), val);
         this->p_size++;
     }
     
-    void push_front(Tp t){
-        new ListStruct(this->p_data, this->p_data->next, t);
+    void push_front(const Tp &t){
+        this->CreateNode(this->p_data, this->p_data->next, t);
         this->p_size++;
     }
     
-    void push_back(Tp t){
-        new ListStruct(this->p_data->back, this->p_data, t);
+    void push_back(const Tp &t){
+        this->CreateNode(this->p_data->back, this->p_data, t);
         this->p_size++;
     }
     
@@ -149,7 +148,7 @@ public:
     
     void clear(){
         this->ClearList();
-        this->p_data = new ListStruct();
+        this->p_data = this->CreateNode();
     }
     
     void erase(iterator &it){
@@ -183,7 +182,7 @@ private:
         if (this->p_data != nullptr && list.size() != 0){
             ListStruct *listBuff = this->p_data;
             std::ranges::for_each(list.begin(), list.end(), [this, &listBuff](Tp t){
-                listBuff->next = new ListStruct(listBuff, this->p_data, t);
+                listBuff->next = this->CreateNode(listBuff, this->p_data, t);
                 listBuff = listBuff->next;
             });
         }
@@ -210,6 +209,14 @@ private:
             delete node;
             this->p_size--;
         }
+    }
+    
+    ListStruct *CreateNode(){
+        return new ListStruct();
+    }
+    
+    ListStruct *CreateNode(ListStruct *start, ListStruct *end, const Tp &t){
+        return new ListStruct(start, end, t);
     }
 };
 
