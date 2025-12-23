@@ -29,13 +29,17 @@ template<typename Tp>
 class Iterator{
     S_DATA<Tp> *p_data = nullptr;
 public:
+    // This is part of iterator traits, needed so that standard STL functions know that my iterator class is indeed an iterator, so it needs to be reported.
+    using iterator_category = std::bidirectional_iterator_tag;
+    using value_type        = Tp;
+    using difference_type   = std::ptrdiff_t;
     
     Iterator() = default;
     Iterator(S_DATA<Tp> *data){
         this->p_data = data;
     }
 
-    Tp &operator* (){
+    Tp &operator* () const{
         return this->p_data->val;
     }
     
@@ -54,10 +58,23 @@ public:
         return *this;
     }
     
-    void operator-- (int a){
+    Iterator operator-- (int a){
+        Iterator tmp = *this;
         if (this->p_data != nullptr){
             this->p_data = this->p_data->back;
         }
+        return tmp;
+    }
+    
+    Iterator &operator-- (){
+        if (this->p_data != nullptr){
+            this->p_data = this->p_data->back;
+        }
+        return *this;
+    }
+    
+    bool operator== (const Iterator<Tp> &it) const{
+        return this->p_data == it.p_data;
     }
     
     bool operator!= (const Iterator<Tp> &it) const{
@@ -72,9 +89,11 @@ public:
 template<typename Tp>
 class list{
 public:
-    using iterator   = Iterator<Tp>;
-    using ListStruct = S_DATA<Tp>;
-    using u_long     = unsigned long;
+    using iterator       = Iterator<Tp>;
+    using const_iterator = const Iterator<Tp>;
+    using ListStruct     = S_DATA<Tp>;
+    using u_long         = unsigned long;
+    
     
 private:
     ListStruct   *p_data      = nullptr;
@@ -138,7 +157,15 @@ public:
         return this->p_data->next;
     }
     
+    const_iterator begin() const {
+        return this->p_data->next;
+    }
+    
     iterator end(){
+        return this->p_data;
+    }
+    
+    const_iterator end() const{
         return this->p_data;
     }
     
