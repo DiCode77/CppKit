@@ -122,6 +122,12 @@ public:
         this->InitList(_list);
     }
     
+    list(const list &_list) : list(){
+        std::ranges::for_each(_list.begin(), _list.end(), [this](Tp t){
+            this->push_back(t);
+        });
+    }
+    
     ~list(){
         this->ClearList();
     }
