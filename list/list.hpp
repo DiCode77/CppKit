@@ -155,6 +155,13 @@ public:
         this->p_size++;
     }
     
+    void push_back(const list &_list){
+        std::ranges::for_each(_list.begin(), _list.end(), [this](Tp t){
+            this->CreateNode(this->p_data->back, this->p_data, t);
+            this->p_size++;
+        });
+    }
+    
     void pop_front(){
         if (this->p_size == 0)
             return;
