@@ -128,6 +128,14 @@ public:
         });
     }
     
+    list(list && _list){
+        this->p_data = _list.p_data;
+        this->p_size = _list.p_size;
+        
+        _list.p_data = _list.CreateNode();
+        _list.p_size = 0;
+    }
+    
     ~list(){
         this->ClearList();
     }
