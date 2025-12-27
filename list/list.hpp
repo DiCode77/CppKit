@@ -12,6 +12,8 @@
 
 namespace dde{
 
+constexpr const char *LIST_VERSION = "0.0.1";
+
 template<typename Tp>
 struct S_DATA{
     Tp val;
