@@ -7,6 +7,7 @@
 
 #ifndef string_hpp
 #define string_hpp
+#include <ostream>
 
 namespace dde{
   
@@ -30,8 +31,22 @@ public:
         }
     }
     
+    string(const string &in) : string(){
+        this->u_size = in.u_size;
+        this->arr = new char[this->u_size +1];
+        this->CopyStrToArr(in.arr, this->arr, this->u_size +1);
+    }
+    
+    ~string(){
+        delete [] this->arr;
+    }
+    
     const char *c_str(){
         return this->arr;
+    }
+    
+    friend std::ostream& operator<< (std::ostream &out, const string &str){
+        return out << str.arr;
     }
     
 private:
