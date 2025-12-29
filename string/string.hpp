@@ -37,6 +37,14 @@ public:
         this->CopyStrToArr(in.arr, this->arr, this->u_size +1);
     }
     
+    string(string &&in) : string(){
+        this->arr = in.arr;
+        this->u_size = in.u_size;
+        
+        in.arr = nullptr;
+        in.u_size = 0;
+    }
+    
     ~string(){
         delete [] this->arr;
     }
@@ -45,8 +53,20 @@ public:
         return this->arr;
     }
     
+    unsigned long size() const{
+        return this->u_size;
+    }
+    
+    char &at(unsigned long pos) const{
+        return *(this->arr + pos);
+    }
+    
     friend std::ostream& operator<< (std::ostream &out, const string &str){
         return out << str.arr;
+    }
+    
+    char &operator[] (unsigned long pos){
+        return *(this->arr + pos);
     }
     
 private:
