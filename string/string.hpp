@@ -16,9 +16,13 @@ using c_char_p_t = const char*;
 using ulong_t    = unsigned long;
 using char_ref_t = char&;
   
-class string{
+typedef struct Storage{
     char_p_t arr;
-    ulong_t  u_size;
+    ulong_t  size;
+} Storage;
+
+class string{
+    Storage stg;
 public:
     string();
     string(c_char_p_t);

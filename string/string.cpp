@@ -1,8 +1,8 @@
 #include "string.hpp"
 
 dde::string::string(){
-    this->arr    = nullptr;
-    this->u_size = 0;
+    this->stg.arr      = nullptr;
+    this->stg.size     = 0;
 }
 
 dde::string::string(dde::c_char_p_t str) : dde::string::string(){
@@ -10,49 +10,49 @@ dde::string::string(dde::c_char_p_t str) : dde::string::string(){
         return;
     }
     else{
-        this->u_size = GetStrlen(str);
-        this->arr = new char[this->u_size +1];
-        this->CopyStrToArr(str, arr, this->u_size +1);
+        this->stg.size = GetStrlen(str);
+        this->stg.arr = new char[this->stg.size +1];
+        this->CopyStrToArr(str, this->stg.arr, this->stg.size +1);
     }
 }
 
 dde::string::string(const dde::string &in) : dde::string::string(){
-    this->u_size = in.u_size;
-    this->arr = new char[this->u_size +1];
-    this->CopyStrToArr(in.arr, this->arr, this->u_size +1);
+    this->stg.size = in.stg.size;
+    this->stg.arr = new char[this->stg.size +1];
+    this->CopyStrToArr(in.stg.arr, this->stg.arr, this->stg.size +1);
 }
 
 
 dde::string::string(dde::string &&in) : dde::string::string(){
-    this->arr = in.arr;
-    this->u_size = in.u_size;
+    this->stg.arr = in.stg.arr;
+    this->stg.size = in.stg.size;
     
-    in.arr = nullptr;
-    in.u_size = 0;
+    in.stg.arr = nullptr;
+    in.stg.size = 0;
 }
 
 dde::string::~string(){
-    delete [] this->arr;
+    delete [] this->stg.arr;
 }
 
 dde::c_char_p_t dde::string::c_str(){
-    return this->arr;
+    return this->stg.arr;
 }
 
 dde::ulong_t dde::string::size() const{
-    return this->u_size;
+    return this->stg.size;
 }
 
 dde::char_ref_t dde::string::at(ulong_t pos) const{
-    return *(this->arr + pos);
+    return *(this->stg.arr + pos);
 }
 
 std::ostream& dde::operator<< (std::ostream &out, const dde::string &str){
-    return out << str.arr;
+    return out << str.stg.arr;
 }
 
 dde::char_ref_t dde::string::operator[] (dde::ulong_t pos){
-    return *(this->arr + pos);
+    return *(this->stg.arr + pos);
 }
 
 dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
