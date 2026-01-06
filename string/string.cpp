@@ -1,8 +1,9 @@
 #include "string.hpp"
 
 dde::string::string(){
-    this->stg.arr      = nullptr;
+    this->stg.arr      = this->GetNewArr(dde::STR_CAPACITY);
     this->stg.size     = 0;
+    this->stg.capacity = dde::STR_CAPACITY;
 }
 
 dde::string::string(dde::c_char_p_t str) : dde::string::string(){
@@ -11,14 +12,16 @@ dde::string::string(dde::c_char_p_t str) : dde::string::string(){
     }
     else{
         this->stg.size = GetStrlen(str);
-        this->stg.arr = new char[this->stg.size +1];
+        this->IncreaseCapacity(this->stg.size);
+        this->stg.arr = this->GetNewArr(this->stg.capacity +1);
         this->CopyStrToArr(str, this->stg.arr, this->stg.size +1);
     }
 }
 
 dde::string::string(const dde::string &in) : dde::string::string(){
     this->stg.size = in.stg.size;
-    this->stg.arr = new char[this->stg.size +1];
+    this->stg.capacity = in.stg.capacity;
+    this->stg.arr = this->GetNewArr(this->stg.capacity +1);
     this->CopyStrToArr(in.stg.arr, this->stg.arr, this->stg.size +1);
 }
 
@@ -26,9 +29,11 @@ dde::string::string(const dde::string &in) : dde::string::string(){
 dde::string::string(dde::string &&in) : dde::string::string(){
     this->stg.arr = in.stg.arr;
     this->stg.size = in.stg.size;
+    this->stg.capacity = in.stg.capacity;
     
     in.stg.arr = nullptr;
     in.stg.size = 0;
+    in.stg.capacity = dde::STR_CAPACITY;
 }
 
 dde::string::~string(){
@@ -47,11 +52,17 @@ dde::char_ref_t dde::string::at(ulong_t pos) const{
     return *(this->stg.arr + pos);
 }
 
+void dde::string::clear(){
+    delete [] this->stg.arr;
+    this->stg.arr = this->GetNewArr(this->stg.capacity +1);
+    this->stg.size = 0;
+}
+
 std::ostream& dde::operator<< (std::ostream &out, const dde::string &str){
     return out << str.stg.arr;
 }
 
-dde::char_ref_t dde::string::operator[] (dde::ulong_t pos){
+dde::char_ref_t dde::string::operator[] (const dde::ulong_t &pos){
     return *(this->stg.arr + pos);
 }
 
@@ -63,13 +74,25 @@ dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
     return size;
 }
 
-void dde::string::CopyStrToArr(dde::c_char_p_t str, dde::char_p_t arr, dde::ulong_t in_size){
+dde::char_p_t dde::string::GetNewArr(const ulong_t &size){
+    return new char[size];
+}
+
+void dde::string::CopyStrToArr(dde::c_char_p_t str, dde::char_p_t arr, const dde::ulong_t &in_size){
     if (str == nullptr || arr == nullptr){
         return;
     }
     else{
         for (dde::ulong_t i = 0; i < in_size; i++){
             arr[i] = str[i];
+        }
+    }
+}
+
+void dde::string::IncreaseCapacity(const ulong_t &size){
+    if (this->stg.capacity < size){
+        while (this->stg.capacity < size) {
+            this->stg.capacity *= dde::STR_INCREASE;
         }
     }
 }
