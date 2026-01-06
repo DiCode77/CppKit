@@ -44,6 +44,7 @@ public:
     friend std::ostream& operator<< (std::ostream&, const string&);
     
     char_ref_t operator[] (const ulong_t&);
+    string&    operator=  (const string&);
     
 private:
     ulong_t GetStrlen(c_char_p_t);
