@@ -19,10 +19,7 @@ dde::string::string(dde::c_char_p_t str) : dde::string::string(){
 }
 
 dde::string::string(const dde::string &in) : dde::string::string(){
-    this->stg.size = in.stg.size;
-    this->stg.capacity = in.stg.capacity;
-    this->stg.arr = this->GetNewArr(this->stg.capacity +1);
-    this->CopyStrToArr(in.stg.arr, this->stg.arr, this->stg.size +1);
+    this->set(in);
 }
 
 
@@ -52,6 +49,16 @@ dde::char_ref_t dde::string::at(ulong_t pos) const{
     return *(this->stg.arr + pos);
 }
 
+void dde::string::set(const string &str){
+    if (this->stg.size != 0 || this->stg.capacity < str.stg.capacity){
+        this->IncreaseCapacity(str.stg.size);
+        this->clear();
+    }
+    
+    this->CopyStrToArr(str.stg.arr, this->stg.arr, str.stg.size +1);
+    this->stg.size = str.stg.size;
+}
+
 void dde::string::clear(){
     delete [] this->stg.arr;
     this->stg.arr = this->GetNewArr(this->stg.capacity +1);
@@ -67,14 +74,7 @@ dde::char_ref_t dde::string::operator[] (const dde::ulong_t &pos){
 }
 
 dde::string& dde::string::operator= (const dde::string &sst){
-    if (this->stg.size != 0 || this->stg.capacity < sst.stg.capacity){
-        this->IncreaseCapacity(sst.stg.size);
-        this->clear();
-    }
-    
-    this->CopyStrToArr(sst.stg.arr, this->stg.arr, sst.stg.size +1);
-    this->stg.size = sst.stg.size;
-    
+    this->set(sst);
     return *this;
 }
 

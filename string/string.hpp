@@ -39,6 +39,7 @@ public:
     ulong_t    size() const;
     char_ref_t at(ulong_t) const;
     
+    void set(const string&);
     void clear();
     
     friend std::ostream& operator<< (std::ostream&, const string&);
