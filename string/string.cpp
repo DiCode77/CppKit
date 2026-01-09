@@ -67,14 +67,13 @@ dde::char_ref_t dde::string::operator[] (const dde::ulong_t &pos){
 }
 
 dde::string& dde::string::operator= (const dde::string &sst){
-    if (this->stg.arr != nullptr){
-        delete this->stg.arr;
+    if (this->stg.size != 0 || this->stg.capacity < sst.stg.capacity){
+        this->IncreaseCapacity(sst.stg.size);
+        this->clear();
     }
     
-    this->stg.size = sst.stg.size;
-    this->IncreaseCapacity(sst.stg.size);
-    this->stg.arr = this->GetNewArr(this->stg.capacity +1);
     this->CopyStrToArr(sst.stg.arr, this->stg.arr, sst.stg.size +1);
+    this->stg.size = sst.stg.size;
     
     return *this;
 }
