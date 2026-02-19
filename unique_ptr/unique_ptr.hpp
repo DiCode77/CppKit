@@ -21,10 +21,8 @@ public:
     }
     
     ~unique_ptr(){
-        if (this->p_data != nullptr){
-            delete this->p_data;
-            this->p_data = nullptr;
-        }
+        delete this->p_data;
+        this->p_data = nullptr;
     }
     
     Te *get() const noexcept{
@@ -39,14 +37,10 @@ public:
     }
     
     void reset(Te *data = nullptr) noexcept{
-        if (this->p_data == data){
-            return;
-        }
-        
-        if (this->p_data != nullptr){
+        if (this->p_data != data){
             delete this->p_data;
+            this->p_data = data;
         }
-        this->p_data = data;
     }
     
     void swap(unique_ptr &u_ptr) noexcept{
@@ -60,14 +54,10 @@ public:
     }
     
     unique_ptr &operator=(unique_ptr &&u_ptr) noexcept{
-        if (this == &u_ptr){
-            return this;
+        if (this != &u_ptr){
+            this->reset(u_ptr.release());
         }
-        else{
-            delete this->p_data;
-            this->p_data = u_ptr.p_data;
-            u_ptr.p_data = nullptr;
-        }
+        
         return *this;
     }
     
