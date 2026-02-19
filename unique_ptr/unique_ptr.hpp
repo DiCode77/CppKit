@@ -55,6 +55,30 @@ public:
         u_ptr.p_data = dt;
     }
     
+    operator bool() const noexcept{
+        return (this->p_data != nullptr) ? true : false;
+    }
+    
+    unique_ptr &operator=(unique_ptr &&u_ptr) noexcept{
+        if (this == &u_ptr){
+            return this;
+        }
+        else{
+            delete this->p_data;
+            this->p_data = u_ptr.p_data;
+            u_ptr.p_data = nullptr;
+        }
+        return *this;
+    }
+    
+    Te *operator->() const noexcept{
+        return this->p_data;
+    }
+    
+    Te &operator*() const noexcept{
+        return *this->p_data;
+    }
+    
     unique_ptr(const unique_ptr&) = delete;
     unique_ptr &operator=(const unique_ptr&) = delete;
 };
