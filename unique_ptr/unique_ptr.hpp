@@ -15,7 +15,7 @@ class unique_ptr{
     Te *p_data;
 public:
     unique_ptr() : p_data(nullptr){}
-    unique_ptr(Te *te) : p_data(te){}
+    explicit unique_ptr(Te *te) : p_data(te){}
     unique_ptr(unique_ptr &&u_ptr) : p_data(u_ptr.p_data){
         u_ptr.p_data = nullptr;
     }
@@ -72,6 +72,11 @@ public:
     unique_ptr(const unique_ptr&) = delete;
     unique_ptr &operator=(const unique_ptr&) = delete;
 };
+
+template<typename Te>
+unique_ptr<Te> make_unique(Te t = Te{}){
+    return unique_ptr<Te>(new Te(t));
+}
 
 };
 
