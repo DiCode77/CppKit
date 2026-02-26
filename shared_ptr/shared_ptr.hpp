@@ -33,7 +33,7 @@ public:
     
     shared_ptr(const shared_ptr &sh_ptr) : shared_ptr(){
         if (!sh_ptr.empty()){
-            this->con_bk = new CONTROL_BK(sh_ptr.con_bk->data, sh_ptr.con_bk->strong, sh_ptr.con_bk->weak);
+            this->con_bk = sh_ptr.con_bk;
             this->con_bk->strong++;
         }
     }
@@ -50,7 +50,23 @@ public:
     }
     
     bool empty() const{
-        return (this->con_bk == nullptr) ? true : false;
+        if (this->con_bk == nullptr)
+            return true;
+        return (this->con_bk->data == nullptr) ? true : false;
+    }
+    
+    void reset(Te *t){
+        if (t != nullptr){
+            this->Release();
+            this->con_bk = new CONTROL_BK(t);
+        }
+        else{
+            this->Release();
+            
+            if (!this->empty()){
+                this->con_bk = nullptr;
+            }
+        }
     }
     
 private:
