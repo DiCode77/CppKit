@@ -19,15 +19,50 @@ class shared_ptr{
     Te      *data;
 public:
     shared_ptr() : strong(nullptr), weak(nullptr), data(nullptr){}
-    shared_ptr(Te *t) : strong(new ulong_t(1)), weak(new ulong_t(0)), data(t){}
-    ~shared_ptr(){
-        *this->strong -= (this->strong != nullptr) ? 1 : 0;
-        
-        if (!*this->strong){
-            delete this->strong;
-            delete this->weak;
-            delete this->data;
+    shared_ptr(Te *t) : shared_ptr(){
+        if (t != nullptr){
+            this->strong = new ulong_t(1);
+            this->weak   = new ulong_t(0);
+            this->data   = t;
         }
+    }
+    
+    shared_ptr(const shared_ptr &sh_ptr) : shared_ptr(){
+        if (!sh_ptr.empty()){
+            this->strong = sh_ptr.strong;
+            this->weak   = sh_ptr.weak;
+            this->data   = sh_ptr.data;
+            
+            *this->strong += 1;
+        }
+    }
+    
+    shared_ptr(shared_ptr &&sh_ptr) : shared_ptr(){
+        if (!sh_ptr.empty()){
+            this->strong = sh_ptr.strong;
+            this->weak   = sh_ptr.weak;
+            this->data   = sh_ptr.data;
+            
+            sh_ptr.strong = nullptr;
+            sh_ptr.weak   = nullptr;
+            sh_ptr.data   = nullptr;
+        }
+    }
+    
+    ~shared_ptr(){
+        if (!this->empty()){
+            *this->strong -= 1;
+            
+            if (!*this->strong){
+                delete this->strong;
+                delete this->weak;
+                delete this->data;
+            }
+        }
+    }
+    
+    bool empty() const{
+        return (this->data == nullptr) ? true : false;
     }
 };
 
