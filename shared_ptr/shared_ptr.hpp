@@ -14,55 +14,61 @@ template <typename Te>
 class shared_ptr{
     using ulong_t = unsigned long;
     
-    ulong_t *strong;
-    ulong_t *weak;
-    Te      *data;
+    struct CONTROL_BK{
+        ulong_t strong;
+        ulong_t weak;
+        Te      *data;
+        
+        CONTROL_BK(Te *t, ulong_t sg = 1, ulong_t wk = 0) : strong(sg), weak(wk), data(t){}
+        
+    } *con_bk;
+    
 public:
-    shared_ptr() : strong(nullptr), weak(nullptr), data(nullptr){}
-    shared_ptr(Te *t) : shared_ptr(){
+    shared_ptr() : con_bk(nullptr) {}
+    explicit shared_ptr(Te *t) : shared_ptr(){
         if (t != nullptr){
-            this->strong = new ulong_t(1);
-            this->weak   = new ulong_t(0);
-            this->data   = t;
+            this->con_bk = new CONTROL_BK(t);
         }
     }
     
     shared_ptr(const shared_ptr &sh_ptr) : shared_ptr(){
         if (!sh_ptr.empty()){
-            this->strong = sh_ptr.strong;
-            this->weak   = sh_ptr.weak;
-            this->data   = sh_ptr.data;
-            
-            *this->strong += 1;
+            this->con_bk = new CONTROL_BK(sh_ptr.con_bk->data, sh_ptr.con_bk->strong, sh_ptr.con_bk->weak);
+            this->con_bk->strong++;
         }
     }
     
-    shared_ptr(shared_ptr &&sh_ptr) : shared_ptr(){
+    shared_ptr(shared_ptr &&sh_ptr) noexcept : shared_ptr(){
         if (!sh_ptr.empty()){
-            this->strong = sh_ptr.strong;
-            this->weak   = sh_ptr.weak;
-            this->data   = sh_ptr.data;
-            
-            sh_ptr.strong = nullptr;
-            sh_ptr.weak   = nullptr;
-            sh_ptr.data   = nullptr;
+            this->con_bk = sh_ptr.con_bk;
+            sh_ptr.con_bk = nullptr;
         }
     }
     
     ~shared_ptr(){
-        if (!this->empty()){
-            *this->strong -= 1;
-            
-            if (!*this->strong){
-                delete this->strong;
-                delete this->weak;
-                delete this->data;
-            }
-        }
+        this->Release();
     }
     
     bool empty() const{
-        return (this->data == nullptr) ? true : false;
+        return (this->con_bk == nullptr) ? true : false;
+    }
+    
+private:
+    void Release(){
+        if (!this->empty()){
+            if (this->con_bk->strong > 0)
+                this->con_bk->strong -= 1;
+            
+            if (!this->con_bk->strong){
+                delete this->con_bk->data;
+                this->con_bk->data = nullptr;
+            }
+            
+            if (!this->con_bk->strong && !this->con_bk->weak){
+                delete this->con_bk;
+                this->con_bk = nullptr;
+            }
+        }
     }
 };
 
