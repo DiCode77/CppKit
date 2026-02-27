@@ -80,6 +80,14 @@ public:
         sh_ptr.con_bk = tmp;
     }
     
+    Te *get() const{
+        return !this->empty() ? this->con_bk->data : nullptr;
+    }
+    
+    ulong_t use_count(){
+        return !this->empty() ? this->con_bk->strong : 0;
+    }
+    
 private:
     void Release(){
         if (!this->empty()){
