@@ -55,6 +55,10 @@ public:
         return (this->con_bk->data == nullptr) ? true : false;
     }
     
+    void reset(){
+        this->reset(nullptr);
+    }
+    
     void reset(Te *t){
         if (t != nullptr){
             this->Release();
@@ -67,6 +71,13 @@ public:
                 this->con_bk = nullptr;
             }
         }
+    }
+    
+    void swap(shared_ptr &sh_ptr){
+        CONTROL_BK *tmp = this->con_bk;
+        
+        this->con_bk  = sh_ptr.con_bk;
+        sh_ptr.con_bk = tmp;
     }
     
 private:
