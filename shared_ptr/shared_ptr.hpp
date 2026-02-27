@@ -84,8 +84,20 @@ public:
         return !this->empty() ? this->con_bk->data : nullptr;
     }
     
-    ulong_t use_count(){
+    ulong_t use_count() const{
         return !this->empty() ? this->con_bk->strong : 0;
+    }
+    
+    explicit operator bool() const noexcept{
+        return !this->empty();
+    }
+    
+    Te &operator*() const noexcept{
+        return *this->con_bk->data;
+    }
+    
+    Te *operator->() const noexcept{
+        return this->con_bk->data;
     }
     
 private:
