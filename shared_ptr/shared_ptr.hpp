@@ -10,6 +10,9 @@
 
 namespace dde{
 
+template<typename T>
+class weak_ptr;
+
 template <typename Te>
 class shared_ptr{
     using ulong_t = unsigned long;
@@ -100,6 +103,7 @@ public:
         return this->con_bk->data;
     }
     
+    friend class dde::weak_ptr<Te>;
 private:
     void Release(){
         if (!this->empty()){
