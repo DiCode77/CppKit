@@ -33,6 +33,20 @@ public:
             this->con_bk = nullptr;
         }
     }
+    
+    weak_ptr &operator= (const dde::shared_ptr<Te> &sh_obj){
+        if (!this->empty()){
+            this->con_bk->weak -= 1;
+        }
+        
+        this->con_bk = sh_obj.con_bk;
+        this->con_bk->weak += 1;
+        return *this;
+    }
+    
+    bool empty() const{
+        return this->con_bk == nullptr ? true : false;
+    }
 };
 
 }
