@@ -34,6 +34,13 @@ public:
         }
     }
     
+    explicit shared_ptr(CONTROL_BK *c_bk) : shared_ptr(){
+        if (c_bk != nullptr){
+            this->con_bk = c_bk;
+            this->con_bk->strong++;
+        }
+    }
+    
     shared_ptr(const shared_ptr &sh_ptr) : shared_ptr(){
         if (!sh_ptr.empty()){
             this->con_bk = sh_ptr.con_bk;
