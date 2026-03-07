@@ -111,12 +111,14 @@ public:
     }
     
     shared_ptr& operator= (const shared_ptr &sh_ptr){
-        if (!this->empty()){
-            this->Release();
+        if (this != &sh_ptr){
+            if (!this->empty()){
+                this->Release();
+            }
+            
+            this->con_bk = sh_ptr.con_bk;
+            this->con_bk->strong += 1;
         }
-        
-        this->con_bk = sh_ptr.con_bk;
-        this->con_bk->strong += 1;
         return *this;
     }
     
