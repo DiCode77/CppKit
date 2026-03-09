@@ -47,6 +47,10 @@ public:
     bool empty() const{
         return this->con_bk == nullptr ? true : false;
     }
+    
+    dde::shared_ptr<Te> lock() const{
+        return dde::shared_ptr<Te>(this->con_bk);
+    }
 };
 
 }

@@ -122,6 +122,18 @@ public:
         return *this;
     }
     
+    shared_ptr& operator= (shared_ptr &&sh_ptr){
+        if (this != &sh_ptr){
+            if (!this->empty()){
+                this->Release();
+            }
+            
+            this->con_bk = sh_ptr.con_bk;
+            sh_ptr.con_bk = nullptr;
+        }
+        return *this;
+    }
+    
     friend class dde::weak_ptr<Te>;
 private:
     void Release(){
