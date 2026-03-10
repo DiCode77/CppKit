@@ -74,7 +74,8 @@ dde::char_ref_t dde::string::operator[] (const dde::ulong_t &pos){
 }
 
 dde::string& dde::string::operator= (const dde::string &sst){
-    this->set(sst);
+    if (this != &sst)
+        this->set(sst);
     return *this;
 }
 
