@@ -44,6 +44,7 @@ public:
     
     char_ref_t operator[] (const ulong_t&);
     string&    operator=  (const string&);
+    string&    operator=  (string&&);
     
 private:
     ulong_t GetStrlen(c_char_p_t);

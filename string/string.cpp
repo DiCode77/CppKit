@@ -79,6 +79,15 @@ dde::string& dde::string::operator= (const dde::string &sst){
     return *this;
 }
 
+dde::string& dde::string::operator= (string &&r_obj){
+    this->Destroy();
+    
+    this->stg = r_obj.stg;
+    r_obj.stg = nullptr;
+    
+    return *this;
+}
+
 dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
     dde::ulong_t size = 0;
     while (str[size] != '\0'){
