@@ -26,7 +26,7 @@ dde::string::string(const dde::string &in) : dde::string::string(){
 }
 
 
-dde::string::string(dde::string &&in) : dde::string::string(){
+dde::string::string(dde::string &&in) noexcept : dde::string::string(){
     this->Destroy();
     
     this->stg = in.stg;
@@ -37,7 +37,7 @@ dde::string::~string(){
     this->Destroy();
 }
 
-dde::c_char_p_t dde::string::c_str(){
+dde::c_char_p_t dde::string::c_str() const{
     return this->stg->arr;
 }
 
@@ -79,7 +79,7 @@ dde::string& dde::string::operator= (const dde::string &sst){
     return *this;
 }
 
-dde::string& dde::string::operator= (string &&r_obj){
+dde::string& dde::string::operator= (string &&r_obj) noexcept{
     this->Destroy();
     
     this->stg = r_obj.stg;

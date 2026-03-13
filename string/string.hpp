@@ -30,10 +30,10 @@ public:
     string();
     string(c_char_p_t);
     string(const string&);
-    string(string&&);
+    string(string&&) noexcept;
     ~string();
     
-    c_char_p_t c_str();
+    c_char_p_t c_str() const;
     ulong_t    size() const;
     char_ref_t at(ulong_t) const;
     
@@ -44,7 +44,7 @@ public:
     
     char_ref_t operator[] (const ulong_t&);
     string&    operator=  (const string&);
-    string&    operator=  (string&&);
+    string&    operator=  (string&&) noexcept;
     
 private:
     ulong_t GetStrlen(c_char_p_t);
