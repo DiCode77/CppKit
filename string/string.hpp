@@ -18,16 +18,14 @@ using char_ref_t = char&;
 
 constexpr ulong_t     STR_CAPACITY = 35;
 constexpr ulong_t     STR_INCREASE = 2;
-constexpr const char *STR_VERSION  = "0.0.1";
-  
-typedef struct Storage{
-    char_p_t arr;
-    ulong_t  size;
-    ulong_t  capacity;
-} Storage;
+constexpr const char *STR_VERSION  = "0.0.2";
 
 class string{
-    Storage stg;
+    struct Storage{
+        char_p_t arr;
+        ulong_t  size;
+        ulong_t  capacity;
+    } *stg;
 public:
     string();
     string(c_char_p_t);
@@ -51,7 +49,8 @@ private:
     ulong_t GetStrlen(c_char_p_t);
     char_p_t GetNewArr(const ulong_t&);
     void CopyStrToArr(c_char_p_t, char_p_t, const ulong_t&);
-    void IncreaseCapacity(const ulong_t&);
+    ulong_t IncreaseCapacity(const ulong_t&, const ulong_t&);
+    void Destroy();
 };
 
 };
