@@ -21,7 +21,7 @@ constexpr ulong_t     STR_INCREASE = 2;
 constexpr const char *STR_VERSION  = "0.0.2";
 
 class string{
-    struct Storage{
+    struct storage{
         char_p_t arr;
         ulong_t  size;
         ulong_t  capacity;
@@ -36,6 +36,7 @@ public:
     c_char_p_t c_str() const;
     ulong_t    size() const;
     char_ref_t at(ulong_t) const;
+    bool       empty() const;
     
     void set(const string&);
     void clear();

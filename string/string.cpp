@@ -1,6 +1,6 @@
 #include "string.hpp"
 
-dde::string::string() : stg(new Storage(this->GetNewArr(dde::STR_CAPACITY), 0, dde::STR_CAPACITY)){}
+dde::string::string() : stg(new storage(this->GetNewArr(dde::STR_CAPACITY), 0, dde::STR_CAPACITY)){}
 
 dde::string::string(dde::c_char_p_t str) : dde::string::string(){
     if (str == nullptr){
@@ -47,6 +47,12 @@ dde::ulong_t dde::string::size() const{
 
 dde::char_ref_t dde::string::at(ulong_t pos) const{
     return *(this->stg->arr + pos);
+}
+
+bool dde::string::empty() const{
+    if (this->stg == nullptr)
+        return true;
+    return !(this->stg->size > 0);
 }
 
 void dde::string::set(const string &str){
