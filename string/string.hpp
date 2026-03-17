@@ -47,6 +47,10 @@ public:
     string&    operator=  (const string&);
     string&    operator=  (string&&) noexcept;
     
+    string &append(const string&);
+    
+    string &operator+= (const string&);
+    
 private:
     ulong_t GetStrlen(c_char_p_t);
     char_p_t GetNewArr(const ulong_t&);

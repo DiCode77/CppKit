@@ -94,6 +94,36 @@ dde::string& dde::string::operator= (string &&r_obj) noexcept{
     return *this;
 }
 
+dde::string &dde::string::append(const dde::string &str){
+    if (!str.empty()){
+        
+        ulong_t m_size = this->stg->size + str.stg->size;
+        if (m_size > this->stg->capacity){
+            this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, m_size);
+            
+            char_p_t _arr = this->stg->arr;
+            this->stg->arr = this->GetNewArr(this->stg->capacity +1);
+            
+            this->CopyStrToArr(_arr, this->stg->arr, this->stg->size);
+            this->CopyStrToArr(str.stg->arr, this->stg->arr + this->stg->size, str.stg->size +1);
+            
+            this->stg->size += str.stg->size;
+            
+            delete [] _arr;
+        }
+        else{
+            this->CopyStrToArr(str.stg->arr, this->stg->arr + this->stg->size, str.stg->size +1);
+            this->stg->size += str.stg->size;
+        }
+    }
+    
+    return *this;
+}
+
+dde::string &dde::string::operator+= (const dde::string &str){
+    return this->append(str);
+}
+
 dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
     dde::ulong_t size = 0;
     while (str[size] != '\0'){
