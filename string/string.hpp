@@ -35,6 +35,7 @@ public:
     
     c_char_p_t c_str() const;
     ulong_t    size() const;
+    ulong_t    capacity() const;
     char_ref_t at(ulong_t) const;
     bool       empty() const;
     
@@ -48,8 +49,10 @@ public:
     string&    operator=  (string&&) noexcept;
     
     string &append(const string&);
+    string &append(c_char_p_t);
     
     string &operator+= (const string&);
+    string &operator+= (c_char_p_t);
     
 private:
     ulong_t GetStrlen(c_char_p_t);

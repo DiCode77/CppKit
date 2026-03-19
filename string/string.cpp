@@ -45,6 +45,10 @@ dde::ulong_t dde::string::size() const{
     return this->stg->size;
 }
 
+dde::ulong_t dde::string::capacity() const{
+    return this->stg->capacity;
+}
+
 dde::char_ref_t dde::string::at(ulong_t pos) const{
     return *(this->stg->arr + pos);
 }
@@ -120,7 +124,39 @@ dde::string &dde::string::append(const dde::string &str){
     return *this;
 }
 
+dde::string &dde::string::append(c_char_p_t str){
+    if (str != nullptr){
+        ulong_t s_size = this->GetStrlen(str);
+        ulong_t m_size = s_size + this->stg->size;
+        
+        if (m_size > this->stg->capacity){
+            this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, m_size);
+            
+            char_p_t _arr = this->stg->arr;
+            this->stg->arr = this->GetNewArr(this->stg->capacity +1);
+            
+            this->CopyStrToArr(_arr, this->stg->arr, this->stg->size);
+            this->CopyStrToArr(str, this->stg->arr + this->stg->size, s_size +1);
+            
+            this->stg->size += s_size;
+            
+            delete [] _arr;
+        }
+        else{
+            this->CopyStrToArr(str, this->stg->arr + this->stg->size, s_size +1);
+            this->stg->size += s_size;
+        }
+        
+    }
+    
+    return *this;
+}
+
 dde::string &dde::string::operator+= (const dde::string &str){
+    return this->append(str);
+}
+
+dde::string &dde::string::operator+= (dde::c_char_p_t str){
     return this->append(str);
 }
 
