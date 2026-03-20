@@ -59,7 +59,7 @@ bool dde::string::empty() const{
     return !(this->stg->size > 0);
 }
 
-void dde::string::set(const string &str){
+dde::string &dde::string::set(const dde::string &str){
     if (this->stg->size != 0 || this->stg->capacity < str.stg->capacity){
         this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, str.stg->size);
         this->clear();
@@ -67,12 +67,16 @@ void dde::string::set(const string &str){
     
     this->CopyStrToArr(str.stg->arr, this->stg->arr, str.stg->size +1);
     this->stg->size = str.stg->size;
+    
+    return *this;
 }
 
-void dde::string::clear(){
+dde::string &dde::string::clear(){
     delete [] this->stg->arr;
     this->stg->arr = this->GetNewArr(this->stg->capacity +1);
     this->stg->size = 0;
+    
+    return *this;
 }
 
 std::ostream& dde::operator<< (std::ostream &out, const dde::string &str){

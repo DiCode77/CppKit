@@ -39,8 +39,8 @@ public:
     char_ref_t at(ulong_t) const;
     bool       empty() const;
     
-    void set(const string&);
-    void clear();
+    string &set(const string&);
+    string &clear();
     
     friend std::ostream& operator<< (std::ostream&, const string&);
     
