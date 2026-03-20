@@ -160,6 +160,10 @@ dde::string &dde::string::operator+= (dde::c_char_p_t str){
     return this->append(str);
 }
 
+dde::string dde::string::operator+ (const dde::string &str) const{
+    return dde::string(*this).append(str);
+}
+
 dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
     dde::ulong_t size = 0;
     while (str[size] != '\0'){
