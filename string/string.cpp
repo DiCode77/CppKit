@@ -25,6 +25,9 @@ dde::string::string(const dde::string &in) : dde::string::string(){
     this->set(in);
 }
 
+dde::string::string(const dde::string &in, const dde::ulong_t &pos, const dde::ulong_t &size) : dde::string::string(){
+    this->set(in, pos, size);
+}
 
 dde::string::string(dde::string &&in) noexcept : dde::string::string(){
     this->Destroy();
@@ -62,11 +65,23 @@ bool dde::string::empty() const{
 dde::string &dde::string::set(const dde::string &str){
     if (this->stg->size != 0 || this->stg->capacity < str.stg->capacity){
         this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, str.stg->size);
-        this->clear();
     }
     
+    this->clear();
     this->CopyStrToArr(str.stg->arr, this->stg->arr, str.stg->size +1);
     this->stg->size = str.stg->size;
+    
+    return *this;
+}
+
+dde::string &dde::string::set(const dde::string &str, const dde::ulong_t &pos, const dde::ulong_t &len){
+    if (!str.empty() && len > this->capacity()){
+        this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, len);
+    }
+    
+    this->clear();
+    this->CopyStrToArr(str.stg->arr + pos, this->stg->arr, len);
+    this->stg->size = len;
     
     return *this;
 }
@@ -177,7 +192,7 @@ dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
 }
 
 dde::char_p_t dde::string::GetNewArr(const ulong_t &size){
-    return new char[size];
+    return new char[size]{};
 }
 
 void dde::string::CopyStrToArr(dde::c_char_p_t str, dde::char_p_t arr, const dde::ulong_t &in_size){

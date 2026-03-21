@@ -30,6 +30,7 @@ public:
     string();
     string(c_char_p_t);
     string(const string&);
+    string(const string&, const ulong_t&, const ulong_t&);
     string(string&&) noexcept;
     ~string();
     
@@ -40,6 +41,7 @@ public:
     bool       empty() const;
     
     string &set(const string&);
+    string &set(const string&, const ulong_t&, const ulong_t&);
     string &clear();
     
     friend std::ostream& operator<< (std::ostream&, const string&);
