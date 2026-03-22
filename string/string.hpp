@@ -58,8 +58,16 @@ public:
     
     string operator+ (const string&) const;
     
+    bool operator== (const string&) const;
+    bool operator== (c_char_p_t) const;
+    bool operator!= (const string&) const;
+    bool operator!= (c_char_p_t) const;
+    
+    friend bool operator== (c_char_p_t, const string&);
+    friend bool operator!= (c_char_p_t, const string&);
+//    
 private:
-    ulong_t GetStrlen(c_char_p_t);
+    ulong_t GetStrlen(c_char_p_t) const;
     char_p_t GetNewArr(const ulong_t&);
     void CopyStrToArr(c_char_p_t, char_p_t, const ulong_t&);
     ulong_t IncreaseCapacity(const ulong_t&, const ulong_t&);

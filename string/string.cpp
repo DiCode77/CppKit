@@ -183,7 +183,54 @@ dde::string dde::string::operator+ (const dde::string &str) const{
     return dde::string(*this).append(str);
 }
 
-dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
+bool dde::string::operator== (const dde::string &str) const{
+    if (this->stg->size == str.stg->size){
+        for (dde::ulong_t i = 0; i < this->stg->size; i++){
+            if (this->stg->arr[i] != str.stg->arr[i]){
+                return false;
+            }
+        }
+    }
+    else{
+        return false;
+    }
+    
+    return true;
+}
+
+bool dde::string::operator== (dde::c_char_p_t str) const{
+    dde::ulong_t size = this->GetStrlen(str);
+    if (this->stg->size == size){
+        for (dde::ulong_t i = 0; i < this->stg->size; i++){
+            if (this->stg->arr[i] != str[i]){
+                return false;
+            }
+        }
+    }
+    else{
+        return false;
+    }
+    
+    return true;
+}
+
+bool dde::string::operator!= (const dde::string &str) const{
+    return !(*this == str);
+}
+
+bool dde::string::operator!= (dde::c_char_p_t c_str) const{
+    return !(*this == c_str);
+}
+
+bool dde::operator== (dde::c_char_p_t c_str, const dde::string &str){
+    return str == c_str;
+}
+
+bool dde::operator!= (dde::c_char_p_t c_str, const dde::string &str){
+    return str != c_str;
+}
+
+dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str) const{
     dde::ulong_t size = 0;
     while (str[size] != '\0'){
         size++;
@@ -191,7 +238,7 @@ dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str){
     return size;
 }
 
-dde::char_p_t dde::string::GetNewArr(const ulong_t &size){
+dde::char_p_t dde::string::GetNewArr(const dde::ulong_t &size){
     return new char[size]{};
 }
 
