@@ -72,6 +72,7 @@ private:
     void CopyStrToArr(c_char_p_t, char_p_t, const ulong_t&);
     ulong_t IncreaseCapacity(const ulong_t&, const ulong_t&);
     void Destroy();
+    bool CompareString(const string&, const string&) const;
 };
 
 };

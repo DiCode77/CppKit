@@ -184,42 +184,19 @@ dde::string dde::string::operator+ (const dde::string &str) const{
 }
 
 bool dde::string::operator== (const dde::string &str) const{
-    if (this->stg->size == str.stg->size){
-        for (dde::ulong_t i = 0; i < this->stg->size; i++){
-            if (this->stg->arr[i] != str.stg->arr[i]){
-                return false;
-            }
-        }
-    }
-    else{
-        return false;
-    }
-    
-    return true;
+    return this->CompareString(*this, str);
 }
 
 bool dde::string::operator== (dde::c_char_p_t str) const{
-    dde::ulong_t size = this->GetStrlen(str);
-    if (this->stg->size == size){
-        for (dde::ulong_t i = 0; i < this->stg->size; i++){
-            if (this->stg->arr[i] != str[i]){
-                return false;
-            }
-        }
-    }
-    else{
-        return false;
-    }
-    
-    return true;
+    return this->CompareString(*this, dde::string(str));
 }
 
 bool dde::string::operator!= (const dde::string &str) const{
-    return !(*this == str);
+    return this->CompareString(*this, str);
 }
 
 bool dde::string::operator!= (dde::c_char_p_t c_str) const{
-    return !(*this == c_str);
+    return !this->CompareString(*this, dde::string(c_str));
 }
 
 bool dde::operator== (dde::c_char_p_t c_str, const dde::string &str){
@@ -271,4 +248,20 @@ void dde::string::Destroy(){
         delete this->stg;
         this->stg = nullptr;
     }
+}
+
+bool dde::string::CompareString(const dde::string &in1, const dde::string &in2) const{
+    if (!in1.empty() && !in2.empty()){
+        if (in1.size() == in2.size()){
+            for (dde::ulong_t i = 0; i < in1.size(); i++){
+                if (in1.stg->arr[i] != in2.stg->arr[i]){
+                    return false;
+                }
+            }
+        }
+        else{
+            return false;
+        }
+    }
+    return true;
 }
