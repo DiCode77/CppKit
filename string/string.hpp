@@ -37,7 +37,7 @@ public:
     c_char_p_t c_str() const;
     ulong_t    size() const;
     ulong_t    capacity() const;
-    char_ref_t at(ulong_t) const;
+    char_ref_t at(ulong_t);
     bool       empty() const;
     
     string &set(const string&);
@@ -54,6 +54,8 @@ public:
     string &append(c_char_p_t);
     string &append(const string&, const ulong_t&);
     string &append(c_char_p_t, const ulong_t&);
+    string &append(const ulong_t&, const string&);
+    string &append(const ulong_t&, c_char_p_t);
     
     string &operator+= (const string&);
     string &operator+= (c_char_p_t);

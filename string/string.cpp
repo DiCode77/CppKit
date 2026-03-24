@@ -52,7 +52,7 @@ dde::ulong_t dde::string::capacity() const{
     return this->stg->capacity;
 }
 
-dde::char_ref_t dde::string::at(ulong_t pos) const{
+dde::char_ref_t dde::string::at(ulong_t pos){
     return *(this->stg->arr + pos);
 }
 
@@ -177,6 +177,20 @@ dde::string &dde::string::append(const dde::string &str, const dde::ulong_t &siz
 
 dde::string &dde::string::append(dde::c_char_p_t str, const dde::ulong_t &size){
     return this->append(dde::string(str, 0, size));
+}
+
+dde::string &dde::string::append(const dde::ulong_t &wle, const dde::string &str){
+    for (dde::ulong_t i = 0; i < wle; i++){
+        this->append(str);
+    }
+    return *this;
+}
+
+dde::string &dde::string::append(const dde::ulong_t &wle, dde::c_char_p_t str){
+    for (dde::ulong_t i = 0; i < wle; i++){
+        this->append(str);
+    }
+    return *this;
 }
 
 dde::string &dde::string::operator+= (const dde::string &str){
