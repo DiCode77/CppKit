@@ -171,6 +171,14 @@ dde::string &dde::string::append(c_char_p_t str){
     return *this;
 }
 
+dde::string &dde::string::append(const dde::string &str, const dde::ulong_t &size){
+    return this->append(dde::string(str, 0, size));
+}
+
+dde::string &dde::string::append(dde::c_char_p_t str, const dde::ulong_t &size){
+    return this->append(dde::string(str, 0, size));
+}
+
 dde::string &dde::string::operator+= (const dde::string &str){
     return this->append(str);
 }
@@ -192,7 +200,7 @@ bool dde::string::operator== (dde::c_char_p_t str) const{
 }
 
 bool dde::string::operator!= (const dde::string &str) const{
-    return this->CompareString(*this, str);
+    return !this->CompareString(*this, str);
 }
 
 bool dde::string::operator!= (dde::c_char_p_t c_str) const{

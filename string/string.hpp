@@ -52,6 +52,8 @@ public:
     
     string &append(const string&);
     string &append(c_char_p_t);
+    string &append(const string&, const ulong_t&);
+    string &append(c_char_p_t, const ulong_t&);
     
     string &operator+= (const string&);
     string &operator+= (c_char_p_t);
