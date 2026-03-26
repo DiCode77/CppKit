@@ -193,6 +193,10 @@ dde::string &dde::string::append(const dde::ulong_t &wle, dde::c_char_p_t str){
     return *this;
 }
 
+dde::ulong_t dde::string::find(const dde::string &str) const{
+    return this->Find(str);
+}
+
 dde::string &dde::string::operator+= (const dde::string &str){
     return this->append(str);
 }
@@ -286,4 +290,24 @@ bool dde::string::CompareString(const dde::string &in1, const dde::string &in2) 
         }
     }
     return true;
+}
+
+dde::ulong_t dde::string::Find(const dde::string &str) const{
+    if (!str.empty()){
+        for (dde::ulong_t i = 0; i < this->size(); i++){
+            if (this->stg->arr[i] == str.stg->arr[0]){
+                dde::ulong_t seq = 0;
+                for (dde::ulong_t j = 0; j < str.size(); j++){
+                    if (this->stg->arr[i + j] == str.stg->arr[j]){
+                        if (++seq == str.size()){
+                            return i;
+                        }
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return dde::npos;
 }

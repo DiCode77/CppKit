@@ -19,6 +19,7 @@ using char_ref_t = char&;
 constexpr ulong_t     STR_CAPACITY = 35;
 constexpr ulong_t     STR_INCREASE = 2;
 constexpr const char *STR_VERSION  = "0.0.2";
+constexpr ulong_t     npos         = ~0;
 
 class string{
     struct storage{
@@ -57,6 +58,8 @@ public:
     string &append(const ulong_t&, const string&);
     string &append(const ulong_t&, c_char_p_t);
     
+    ulong_t find(const string&) const;
+    
     string &operator+= (const string&);
     string &operator+= (c_char_p_t);
     
@@ -77,6 +80,7 @@ private:
     ulong_t IncreaseCapacity(const ulong_t&, const ulong_t&);
     void Destroy();
     bool CompareString(const string&, const string&) const;
+    ulong_t Find(const dde::string&) const;
 };
 
 };
