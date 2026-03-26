@@ -59,6 +59,7 @@ public:
     string &append(const ulong_t&, c_char_p_t);
     
     ulong_t find(const string&) const;
+    ulong_t rfind(const string&) const;
     
     string &operator+= (const string&);
     string &operator+= (c_char_p_t);
@@ -81,6 +82,7 @@ private:
     void Destroy();
     bool CompareString(const string&, const string&) const;
     ulong_t Find(const dde::string&) const;
+    ulong_t RFind(const string&) const;
 };
 
 };

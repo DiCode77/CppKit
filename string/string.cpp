@@ -197,6 +197,10 @@ dde::ulong_t dde::string::find(const dde::string &str) const{
     return this->Find(str);
 }
 
+dde::ulong_t dde::string::rfind(const dde::string &str) const{
+    return this->RFind(str);
+}
+
 dde::string &dde::string::operator+= (const dde::string &str){
     return this->append(str);
 }
@@ -297,10 +301,30 @@ dde::ulong_t dde::string::Find(const dde::string &str) const{
         for (dde::ulong_t i = 0; i < this->size(); i++){
             if (this->stg->arr[i] == str.stg->arr[0]){
                 dde::ulong_t seq = 0;
-                for (dde::ulong_t j = 0; j < str.size(); j++){
+                for (dde::ulong_t j = 0; j < str.size() && i + j < this->size(); j++){
                     if (this->stg->arr[i + j] == str.stg->arr[j]){
                         if (++seq == str.size()){
                             return i;
+                        }
+                    }else{
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    return dde::npos;
+}
+
+dde::ulong_t dde::string::RFind(const dde::string &str) const{
+    if (!str.empty()){
+        for (dde::ulong_t i = this->size() -1; i > 0; i--){
+            if (this->stg->arr[i] == str.stg->arr[str.size() -1]){
+                dde::ulong_t seq = 0;
+                for (dde::ulong_t j = 0; j < str.size(); j++){
+                    if (this->stg->arr[i - j] == str.stg->arr[(str.size() -1) - j]){
+                        if (++seq == str.size()){
+                            return i - (str.size() -1);
                         }
                     }else{
                         break;
