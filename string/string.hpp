@@ -61,6 +61,8 @@ public:
     ulong_t find(const string&) const;
     ulong_t rfind(const string&) const;
     
+    bool contains(const string&) const;
+    
     string &operator+= (const string&);
     string &operator+= (c_char_p_t);
     

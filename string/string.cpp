@@ -201,6 +201,10 @@ dde::ulong_t dde::string::rfind(const dde::string &str) const{
     return this->RFind(str);
 }
 
+bool dde::string::contains(const dde::string &str) const{
+    return this->Find(str) != dde::npos;
+}
+
 dde::string &dde::string::operator+= (const dde::string &str){
     return this->append(str);
 }
