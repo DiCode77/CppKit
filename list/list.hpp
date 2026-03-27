@@ -9,6 +9,7 @@
 #define list_hpp
 #include <initializer_list>
 #include <ranges>
+#include <algorithm>
 
 namespace dde{
 
