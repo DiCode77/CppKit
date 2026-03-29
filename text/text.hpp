@@ -8,6 +8,10 @@
 #ifndef text_hpp
 #define text_hpp
 
+/*
+ This class is a test class
+*/
+
 namespace dde{
 class text{
     using ulong_t    = unsigned long;
@@ -49,6 +53,10 @@ public:
                 this->stg->size    = siz;
                 this->stg->reserve = cap;
             }
+            else{
+                this->stg->size    = siz;
+                this->stg->reserve = cap;
+            }
             
             this->CopyStrToArr(str, this->stg->arr, siz +1);
             this->set.size += siz;
@@ -56,11 +64,29 @@ public:
         }
     }
     
+    ulong_t size() const{
+        return this->set.size;
+    }
+    
+    bool empty() const{
+        return !(this->set.size > 0);
+    }
+    
+    text &append(const text &obj){
+        return this->AddStr(obj.stg->arr, *this);
+    }
+    
+    text &append(c_char_p_t str){
+        return this->AddStr(str, *this);
+    }
+    
+    
 private:
     ulong_t GetStrLen(c_char_p_t) const;
     ulong_t IncreaseCapacity(const ulong_t&, const ulong_t&);
     char_p_t GetNewArr(const ulong_t&);
     void CopyStrToArr(c_char_p_t, char_p_t, const ulong_t&);
+    text &AddStr(c_char_p_t, text&);
 };
 
 
