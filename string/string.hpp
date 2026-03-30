@@ -11,17 +11,19 @@
 
 namespace dde{
 
-using char_p_t   = char*;
-using c_char_p_t = const char*;
-using ulong_t    = unsigned long;
-using char_ref_t = char&;
-
-constexpr ulong_t     STR_CAPACITY = 35;
-constexpr ulong_t     STR_INCREASE = 2;
-constexpr const char *STR_VERSION  = "0.0.2";
-constexpr ulong_t     npos         = ~0;
-
 class string{
+public:
+    using char_p_t   = char*;
+    using c_char_p_t = const char*;
+    using ulong_t    = unsigned long;
+    using char_ref_t = char&;
+
+    static constexpr ulong_t     STR_CAPACITY = 35;
+    static constexpr ulong_t     STR_INCREASE = 2;
+    static constexpr const char *STR_VERSION  = "0.0.2";
+    static constexpr ulong_t     npos         = ~0;
+    
+private:
     struct storage{
         char_p_t arr;
         ulong_t  size;

@@ -1,8 +1,8 @@
 #include "string.hpp"
 
-dde::string::string() : stg(new storage(this->GetNewArr(dde::STR_CAPACITY), 0, dde::STR_CAPACITY)){}
+dde::string::string() : stg(new storage(this->GetNewArr(dde::string::STR_CAPACITY), 0, dde::string::STR_CAPACITY)){}
 
-dde::string::string(dde::c_char_p_t str) : dde::string::string(){
+dde::string::string(dde::string::c_char_p_t str) : dde::string::string(){
     if (str == nullptr){
         return;
     }
@@ -25,7 +25,7 @@ dde::string::string(const dde::string &in) : dde::string::string(){
     this->set(in);
 }
 
-dde::string::string(const dde::string &in, const dde::ulong_t &pos, const dde::ulong_t &size) : dde::string::string(){
+dde::string::string(const dde::string &in, const dde::string::ulong_t &pos, const dde::string::ulong_t &size) : dde::string::string(){
     this->set(in, pos, size);
 }
 
@@ -40,31 +40,31 @@ dde::string::~string(){
     this->Destroy();
 }
 
-dde::c_char_p_t dde::string::c_str() const{
+dde::string::c_char_p_t dde::string::c_str() const{
     return this->stg->arr;
 }
 
-dde::char_p_t dde::string::data() const{
+dde::string::char_p_t dde::string::data() const{
     return this->stg->arr;
 }
 
-dde::ulong_t dde::string::size() const{
+dde::string::ulong_t dde::string::size() const{
     return this->stg->size;
 }
 
-dde::ulong_t dde::string::capacity() const{
+dde::string::ulong_t dde::string::capacity() const{
     return this->stg->capacity;
 }
 
-dde::char_ref_t dde::string::at(ulong_t pos){
+dde::string::char_ref_t dde::string::at(ulong_t pos){
     return *(this->stg->arr + pos);
 }
 
-dde::char_ref_t dde::string::front() const{
+dde::string::char_ref_t dde::string::front() const{
     return *this->data();
 }
 
-dde::char_ref_t dde::string::back() const{
+dde::string::char_ref_t dde::string::back() const{
     return *(this->data() + this->size() -1);
 }
 
@@ -86,7 +86,7 @@ dde::string &dde::string::set(const dde::string &str){
     return *this;
 }
 
-dde::string &dde::string::set(const dde::string &str, const dde::ulong_t &pos, const dde::ulong_t &len){
+dde::string &dde::string::set(const dde::string &str, const dde::string::ulong_t &pos, const dde::string::ulong_t &len){
     if (!str.empty() && len > this->capacity()){
         this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, len);
     }
@@ -110,7 +110,7 @@ std::ostream& dde::operator<< (std::ostream &out, const dde::string &str){
     return out << ((str.stg == nullptr) ? "" : str.stg->arr);
 }
 
-dde::char_ref_t dde::string::operator[] (const dde::ulong_t &pos){
+dde::string::char_ref_t dde::string::operator[] (const dde::string::ulong_t &pos){
     return *(this->stg->arr + pos);
 }
 
@@ -183,45 +183,45 @@ dde::string &dde::string::append(c_char_p_t str){
     return *this;
 }
 
-dde::string &dde::string::append(const dde::string &str, const dde::ulong_t &size){
+dde::string &dde::string::append(const dde::string &str, const dde::string::ulong_t &size){
     return this->append(dde::string(str, 0, size));
 }
 
-dde::string &dde::string::append(dde::c_char_p_t str, const dde::ulong_t &size){
+dde::string &dde::string::append(dde::string::c_char_p_t str, const dde::string::ulong_t &size){
     return this->append(dde::string(str, 0, size));
 }
 
-dde::string &dde::string::append(const dde::ulong_t &wle, const dde::string &str){
-    for (dde::ulong_t i = 0; i < wle; i++){
+dde::string &dde::string::append(const dde::string::ulong_t &wle, const dde::string &str){
+    for (dde::string::ulong_t i = 0; i < wle; i++){
         this->append(str);
     }
     return *this;
 }
 
-dde::string &dde::string::append(const dde::ulong_t &wle, dde::c_char_p_t str){
-    for (dde::ulong_t i = 0; i < wle; i++){
+dde::string &dde::string::append(const dde::string::ulong_t &wle, dde::string::c_char_p_t str){
+    for (dde::string::ulong_t i = 0; i < wle; i++){
         this->append(str);
     }
     return *this;
 }
 
-dde::ulong_t dde::string::find(const dde::string &str) const{
+dde::string::ulong_t dde::string::find(const dde::string &str) const{
     return this->Find(str);
 }
 
-dde::ulong_t dde::string::rfind(const dde::string &str) const{
+dde::string::ulong_t dde::string::rfind(const dde::string &str) const{
     return this->RFind(str);
 }
 
 bool dde::string::contains(const dde::string &str) const{
-    return this->Find(str) != dde::npos;
+    return this->Find(str) != dde::string::npos;
 }
 
 dde::string &dde::string::operator+= (const dde::string &str){
     return this->append(str);
 }
 
-dde::string &dde::string::operator+= (dde::c_char_p_t str){
+dde::string &dde::string::operator+= (dde::string::c_char_p_t str){
     return this->append(str);
 }
 
@@ -233,7 +233,7 @@ bool dde::string::operator== (const dde::string &str) const{
     return this->CompareString(*this, str);
 }
 
-bool dde::string::operator== (dde::c_char_p_t str) const{
+bool dde::string::operator== (dde::string::c_char_p_t str) const{
     return this->CompareString(*this, dde::string(str));
 }
 
@@ -241,47 +241,47 @@ bool dde::string::operator!= (const dde::string &str) const{
     return !this->CompareString(*this, str);
 }
 
-bool dde::string::operator!= (dde::c_char_p_t c_str) const{
+bool dde::string::operator!= (dde::string::c_char_p_t c_str) const{
     return !this->CompareString(*this, dde::string(c_str));
 }
 
-bool dde::operator== (dde::c_char_p_t c_str, const dde::string &str){
+bool dde::operator== (dde::string::c_char_p_t c_str, const dde::string &str){
     return str == c_str;
 }
 
-bool dde::operator!= (dde::c_char_p_t c_str, const dde::string &str){
+bool dde::operator!= (dde::string::c_char_p_t c_str, const dde::string &str){
     return str != c_str;
 }
 
-dde::ulong_t dde::string::GetStrlen(dde::c_char_p_t str) const{
-    dde::ulong_t size = 0;
+dde::string::ulong_t dde::string::GetStrlen(dde::string::c_char_p_t str) const{
+    dde::string::ulong_t size = 0;
     while (str[size] != '\0'){
         size++;
     }
     return size;
 }
 
-dde::char_p_t dde::string::GetNewArr(const dde::ulong_t &size){
+dde::string::char_p_t dde::string::GetNewArr(const dde::string::ulong_t &size){
     return new char[size]{};
 }
 
-void dde::string::CopyStrToArr(dde::c_char_p_t str, dde::char_p_t arr, const dde::ulong_t &in_size){
+void dde::string::CopyStrToArr(dde::string::c_char_p_t str, dde::string::char_p_t arr, const dde::string::ulong_t &in_size){
     if (str == nullptr || arr == nullptr){
         return;
     }
     else{
-        for (dde::ulong_t i = 0; i < in_size; i++){
+        for (dde::string::ulong_t i = 0; i < in_size; i++){
             arr[i] = str[i];
         }
     }
 }
 
-dde::ulong_t dde::string::IncreaseCapacity(const ulong_t &m_cap, const ulong_t &size){
+dde::string::ulong_t dde::string::IncreaseCapacity(const dde::string::ulong_t &m_cap, const dde::string::ulong_t &size){
     ulong_t capacity(m_cap);
     
     if (capacity < size){
         while (capacity < size) {
-            capacity *= dde::STR_INCREASE;
+            capacity *= dde::string::STR_INCREASE;
         }
     }
     
@@ -299,7 +299,7 @@ void dde::string::Destroy(){
 bool dde::string::CompareString(const dde::string &in1, const dde::string &in2) const{
     if (!in1.empty() && !in2.empty()){
         if (in1.size() == in2.size()){
-            for (dde::ulong_t i = 0; i < in1.size(); i++){
+            for (dde::string::ulong_t i = 0; i < in1.size(); i++){
                 if (in1.stg->arr[i] != in2.stg->arr[i]){
                     return false;
                 }
@@ -312,12 +312,12 @@ bool dde::string::CompareString(const dde::string &in1, const dde::string &in2) 
     return true;
 }
 
-dde::ulong_t dde::string::Find(const dde::string &str) const{
+dde::string::ulong_t dde::string::Find(const dde::string &str) const{
     if (!str.empty()){
-        for (dde::ulong_t i = 0; i < this->size(); i++){
+        for (dde::string::ulong_t i = 0; i < this->size(); i++){
             if (this->stg->arr[i] == str.stg->arr[0]){
-                dde::ulong_t seq = 0;
-                for (dde::ulong_t j = 0; j < str.size() && i + j < this->size(); j++){
+                dde::string::ulong_t seq = 0;
+                for (dde::string::ulong_t j = 0; j < str.size() && i + j < this->size(); j++){
                     if (this->stg->arr[i + j] == str.stg->arr[j]){
                         if (++seq == str.size()){
                             return i;
@@ -329,15 +329,15 @@ dde::ulong_t dde::string::Find(const dde::string &str) const{
             }
         }
     }
-    return dde::npos;
+    return dde::string::npos;
 }
 
-dde::ulong_t dde::string::RFind(const dde::string &str) const{
+dde::string::ulong_t dde::string::RFind(const dde::string &str) const{
     if (!str.empty()){
-        for (dde::ulong_t i = this->size() -1; i > 0; i--){
+        for (dde::string::ulong_t i = this->size() -1; i > 0; i--){
             if (this->stg->arr[i] == str.stg->arr[str.size() -1]){
-                dde::ulong_t seq = 0;
-                for (dde::ulong_t j = 0; j < str.size(); j++){
+                dde::string::ulong_t seq = 0;
+                for (dde::string::ulong_t j = 0; j < str.size(); j++){
                     if (this->stg->arr[i - j] == str.stg->arr[(str.size() -1) - j]){
                         if (++seq == str.size()){
                             return i - (str.size() -1);
@@ -349,5 +349,5 @@ dde::ulong_t dde::string::RFind(const dde::string &str) const{
             }
         }
     }
-    return dde::npos;
+    return dde::string::npos;
 }
