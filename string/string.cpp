@@ -44,6 +44,10 @@ dde::c_char_p_t dde::string::c_str() const{
     return this->stg->arr;
 }
 
+dde::char_p_t dde::string::data() const{
+    return this->stg->arr;
+}
+
 dde::ulong_t dde::string::size() const{
     return this->stg->size;
 }
@@ -54,6 +58,14 @@ dde::ulong_t dde::string::capacity() const{
 
 dde::char_ref_t dde::string::at(ulong_t pos){
     return *(this->stg->arr + pos);
+}
+
+dde::char_ref_t dde::string::front() const{
+    return *this->data();
+}
+
+dde::char_ref_t dde::string::back() const{
+    return *(this->data() + this->size() -1);
 }
 
 bool dde::string::empty() const{

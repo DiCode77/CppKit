@@ -36,9 +36,12 @@ public:
     ~string();
     
     c_char_p_t c_str() const;
+    char_p_t   data() const;
     ulong_t    size() const;
     ulong_t    capacity() const;
     char_ref_t at(ulong_t);
+    char_ref_t front() const;
+    char_ref_t back() const;
     bool       empty() const;
     
     string &set(const string&);
