@@ -106,6 +106,14 @@ dde::string &dde::string::clear(){
     return *this;
 }
 
+dde::string &dde::string::assign(const dde::string &str){
+    return this->set(str);
+}
+
+dde::string &dde::string::assign(const dde::string &str, const dde::string::ulong_t &pos, const dde::string::ulong_t &len){
+    return this->set(str, pos, len);
+}
+
 std::ostream& dde::operator<< (std::ostream &out, const dde::string &str){
     return out << ((str.stg == nullptr) ? "" : str.stg->arr);
 }

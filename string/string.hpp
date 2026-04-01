@@ -50,6 +50,9 @@ public:
     string &set(const string&, const ulong_t&, const ulong_t&);
     string &clear();
     
+    string &assign(const string&);
+    string &assign(const string&, const ulong_t&, const ulong_t&);
+    
     friend std::ostream& operator<< (std::ostream&, const string&);
     
     char_ref_t operator[] (const ulong_t&);
