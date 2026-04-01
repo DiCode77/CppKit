@@ -261,6 +261,11 @@ bool dde::operator!= (dde::string::c_char_p_t c_str, const dde::string &str){
     return str != c_str;
 }
 
+void dde::string::Init(){
+    if (this->stg == nullptr)
+        this->stg = new storage(this->GetNewArr(dde::string::STR_CAPACITY), 0, dde::string::STR_CAPACITY);
+}
+
 dde::string::ulong_t dde::string::GetStrlen(dde::string::c_char_p_t str) const{
     dde::string::ulong_t size = 0;
     while (str[size] != '\0'){
