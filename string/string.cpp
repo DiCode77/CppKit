@@ -74,6 +74,16 @@ bool dde::string::empty() const{
     return !(this->stg->size > 0);
 }
 
+dde::string &dde::string::print(){
+    std::print("{}", this->c_str());
+    return *this;
+}
+
+dde::string &dde::string::printn(){
+    std::print("{}\n", this->c_str());
+    return *this;
+}
+
 dde::string &dde::string::set(const dde::string &str){
     if (this->stg->size != 0 || this->stg->capacity < str.stg->capacity){
         this->stg->capacity = this->IncreaseCapacity(this->stg->capacity, str.stg->size);

@@ -46,6 +46,9 @@ public:
     char_ref_t back() const;
     bool       empty() const;
     
+    string &print();
+    string &printn();
+    
     string &set(const string&);
     string &set(const string&, const ulong_t&, const ulong_t&);
     string &clear();
