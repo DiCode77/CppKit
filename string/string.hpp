@@ -20,7 +20,7 @@ public:
 
     static constexpr ulong_t     STR_CAPACITY = 35;
     static constexpr ulong_t     STR_INCREASE = 2;
-    static constexpr const char *STR_VERSION  = "0.0.2";
+    static constexpr const char *STR_VERSION  = "0.0.3";
     static constexpr ulong_t     npos         = ~0;
     
 private:
@@ -86,7 +86,10 @@ public:
     
     friend bool operator== (c_char_p_t, const string&);
     friend bool operator!= (c_char_p_t, const string&);
-//    
+    
+    // A test function to check if a string is empty.
+    explicit operator bool() const;
+//
 private:
     void Init();
     ulong_t GetStrlen(c_char_p_t) const;

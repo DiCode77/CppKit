@@ -271,6 +271,10 @@ bool dde::operator!= (dde::string::c_char_p_t c_str, const dde::string &str){
     return str != c_str;
 }
 
+dde::string::operator bool() const{
+    return !this->empty();
+}
+
 void dde::string::Init(){
     if (this->stg == nullptr)
         this->stg = new storage(this->GetNewArr(dde::string::STR_CAPACITY), 0, dde::string::STR_CAPACITY);
