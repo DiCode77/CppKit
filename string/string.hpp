@@ -8,6 +8,7 @@
 #ifndef string_hpp
 #define string_hpp
 #include <ostream>
+#include <print>
 
 namespace dde{
 
