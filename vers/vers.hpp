@@ -8,6 +8,7 @@
 #ifndef vers_hpp
 #define vers_hpp
 #include <typeinfo>
+#include <cstdlib>
 
 namespace dde{
 
@@ -28,23 +29,44 @@ class vers{
     
 public:
     vers() : t_info(nullptr, TYPE::NONE){}
-    vers(auto ao) : vers(){
-        this->t_info.t = this->DetermineType(ao);
+    
+    template <typename Te>
+    vers(Te t) : vers(){
+        this->t_info.s = (Te*)std::malloc(sizeof(Te));
+        new(this->t_info.s) Te(t);
     }
-private:
-    TYPE DetermineType(const auto &ao){
-        if (typeid(ao) == typeid(bool)){
-            return TYPE::BOOL;
-        }else if (typeid(ao) == typeid(char)){
-            return TYPE::CHAR;
-        }else if (typeid(ao) == typeid(int)){
-            return TYPE::INT;
-        }else if (typeid(ao) == typeid(long)){
-            return TYPE::LONG;
-        }else if (typeid(ao) == typeid(double)){
-            return TYPE::DOUBLE;
+    
+    ~vers(){
+        this->Destroy(this->t_info.s);
+    }
+    
+    template <typename Te>
+    vers &operator= (Te t){
+        if (this->t_info.s != nullptr){
+            this->Destroy<Te*>(this->t_info.s);
         }
-        return TYPE::NONE;
+        
+        this->t_info.s = (Te*)std::malloc(sizeof(Te));
+        new(this->t_info.s) Te(t);
+        return *this;
+    }
+    
+    
+    template <typename Te>
+    Te &get(){
+        return *static_cast<Te*>(this->t_info.s);
+    }
+    
+private:
+    
+    template <typename Te = void*>
+    void Destroy(void *des){
+        if (des != nullptr){
+            Te *t = (Te*)des;
+            t->~Te();
+            std::free(des);
+            
+        }
     }
 };
 
