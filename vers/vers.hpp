@@ -23,54 +23,70 @@ class vers{
     } stg;
     
 public:
+    ~vers(){
+        this->Destroy(this->GetStg().type);
+    }
+    
     vers() : stg(nullptr, nullptr){}
     
     template <typename Te>
-    vers(Te t) : vers(){
-        this->stg.type = static_cast<Te*>(std::malloc(sizeof(Te)));
-        new(this->stg.type) Te(t);
-        
-        this->stg.dest = [](void_p_t p_te){
-            static_cast<Te*>(p_te)->~Te();
-        };
-    }
-    
-    ~vers(){
-        this->Destroy(this->stg.type);
+    vers(const Te t) : vers(){
+        this->set<Te>(t);
     }
     
     template <typename Te>
-    vers &operator= (Te t){
-        if (!this->empty()){
-            this->Destroy(this->stg.type);
-        }
-        
-        this->stg.type = static_cast<Te*>(std::malloc(sizeof(Te)));
-        new(this->stg.type) Te(t);
-        
-        this->stg.dest = [](void_p_t p_te){
-            static_cast<Te*>(p_te)->~Te();
-        };
-        
-        return *this;
+    vers &operator= (const Te t){
+        return this->set<Te>(t);
     }
     
     template <typename Te>
     Te &get(){
-        return *static_cast<Te*>(this->stg.type);
+        return *static_cast<Te*>(this->GetStg().type);
     }
     
     bool empty() const{
         return !(this->stg.type != nullptr && this->stg.dest != nullptr);
     }
     
+    template <typename Te>
+    vers &set(Te t){
+        this->Destroy(this->GetStg().type);
+        if (this->AllocateMemory_Init<Te>(t)){
+            this->ImplCaptureType<Te>();
+        }
+        
+        return *this;
+    }
+    
 private:
+    Storage &GetStg(){
+        return this->stg;
+    }
+    
+    template <typename Te>
+    bool AllocateMemory_Init(Te t){
+        if (this->empty()){
+            this->GetStg().type = static_cast<Te*>(std::malloc(sizeof(Te)));
+            new(this->GetStg().type) Te(t);
+            
+            return true;
+        }
+        return false;
+    }
+    
+    template <typename Te>
+    void ImplCaptureType(){
+        this->GetStg().dest = [](void_p_t p_te){
+            static_cast<Te*>(p_te)->~Te();
+        };
+    }
+    
     void Destroy(void_p_t p_te){
-        if (!this->empty()){
-            this->stg.dest(p_te);
-            this->stg.dest = nullptr;
-            std::free(this->stg.type);
-            this->stg.type = nullptr;
+        if (!this->empty() && p_te != nullptr){
+            this->GetStg().dest(p_te);
+            this->GetStg().dest = nullptr;
+            std::free(this->GetStg().type);
+            this->GetStg().type = nullptr;
         }
     }
 };
