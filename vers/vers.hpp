@@ -10,6 +10,7 @@
 #include <typeinfo>
 #include <cstdlib>
 #include <utility>
+#include <type_traits>
 
 namespace dde{
 
@@ -24,18 +25,18 @@ class vers{
     
 public:
     ~vers(){
-        this->Destroy(this->GetStg().type);
+        this->Destroy();
     }
     
     vers() : stg(nullptr, nullptr){}
     
     template <typename Te>
-    vers(const Te t) : vers(){
+    vers(const Te &t) : vers(){
         this->set<Te>(t);
     }
     
     template <typename Te>
-    vers &operator= (const Te t){
+    vers &operator= (const Te &t){
         return this->set<Te>(t);
     }
     
@@ -49,12 +50,13 @@ public:
     }
     
     template <typename Te>
-    vers &set(Te t){
-        this->Destroy(this->GetStg().type);
-        if (this->AllocateMemory_Init<Te>(t)){
-            this->ImplCaptureType<Te>();
-        }
+    vers &set(const Te &t){
+        this->Destroy();
         
+        using Real = std::decay_t<decltype(t)>;
+        if (this->AllocateMemory_Init<Real>(t)){
+            this->ImplCaptureType<Real>();
+        }
         return *this;
     }
     
@@ -64,7 +66,7 @@ private:
     }
     
     template <typename Te>
-    bool AllocateMemory_Init(Te t){
+    bool AllocateMemory_Init(const Te &t){
         if (this->empty()){
             this->GetStg().type = static_cast<Te*>(std::malloc(sizeof(Te)));
             new(this->GetStg().type) Te(t);
@@ -81,9 +83,9 @@ private:
         };
     }
     
-    void Destroy(void_p_t p_te){
-        if (!this->empty() && p_te != nullptr){
-            this->GetStg().dest(p_te);
+    void Destroy(){
+        if (!this->empty()){
+            this->GetStg().dest(this->GetStg().type);
             this->GetStg().dest = nullptr;
             std::free(this->GetStg().type);
             this->GetStg().type = nullptr;
