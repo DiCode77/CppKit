@@ -21,23 +21,45 @@ class vers{
     struct Storage{
         void_p_t  type;
         void_fp_t dest;
-    } stg;
+    } *stg;
     
 public:
     ~vers(){
         this->Destroy();
+        if (this->stg != nullptr)
+            std::free(this->stg);
     }
     
-    vers() : stg(nullptr, nullptr){}
+    vers();
     
     template <typename Te>
     vers(const Te &t) : vers(){
         this->set<Te>(t);
     }
     
+    vers(vers &&vs) : vers(){
+        this->Destroy();
+        if (this->stg != nullptr)
+            std::free(this->stg);
+        
+        this->stg = vs.stg;
+        vs.stg    = nullptr;
+    }
+    
     template <typename Te>
     vers &operator= (const Te &t){
         return this->set<Te>(t);
+    }
+    
+    vers &operator= (vers &&vs) noexcept{
+        this->Destroy();
+        if (this->stg != nullptr)
+            std::free(this->stg);
+        
+        this->stg = vs.stg;
+        vs.stg    = nullptr;
+        
+        return *this;
     }
     
     template <typename Te>
@@ -46,7 +68,9 @@ public:
     }
     
     bool empty() const{
-        return !(this->stg.type != nullptr && this->stg.dest != nullptr);
+        if (this->stg == nullptr)
+            return true;
+        return !(this->stg->type != nullptr && this->stg->dest != nullptr);
     }
     
     template <typename Te>
@@ -62,7 +86,7 @@ public:
     
 private:
     Storage &GetStg(){
-        return this->stg;
+        return *this->stg;
     }
     
     template <typename Te>
