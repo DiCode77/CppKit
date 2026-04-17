@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <utility>
 #include <type_traits>
+#include <memory>
 
 namespace dde{
 
