@@ -18,10 +18,12 @@ namespace dde{
 class vers{
     using void_p_t  = void*;
     using void_fp_t = void(*)(void*);
+    using c_type_t  = const std::type_info;
     
     struct Storage{
         void_p_t  type;
         void_fp_t dest;
+        c_type_t* type_info;
     } *stg;
     
 public:
@@ -68,6 +70,10 @@ public:
         return *static_cast<Te*>(this->GetStg().type);
     }
     
+    c_type_t &getTypeId(){
+        return *this->GetStg().type_info;
+    }
+    
     bool empty() const{
         if (this->stg == nullptr)
             return true;
@@ -95,6 +101,7 @@ private:
         if (this->empty()){
             this->GetStg().type = static_cast<Te*>(std::malloc(sizeof(Te)));
             new(this->GetStg().type) Te(t);
+            this->GetStg().type_info = &typeid(t);
             
             return true;
         }
