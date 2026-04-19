@@ -27,12 +27,7 @@ class vers{
     } *stg;
     
 public:
-    ~vers(){
-        this->Destroy();
-        if (this->stg != nullptr)
-            std::free(this->stg);
-    }
-    
+    ~vers();
     vers();
     
     template <typename Te>
@@ -40,10 +35,8 @@ public:
         this->set<Te>(t);
     }
     
-    vers(vers &&vs) : vers(){
-        this->Destroy();
-        if (this->stg != nullptr)
-            std::free(this->stg);
+    vers(vers &&vs) noexcept : vers(){
+        this->DestroyEvrything();
         
         this->stg = vs.stg;
         vs.stg    = nullptr;
@@ -55,13 +48,10 @@ public:
     }
     
     vers &operator= (vers &&vs) noexcept{
-        this->Destroy();
-        if (this->stg != nullptr)
-            std::free(this->stg);
+        this->DestroyEvrything();
         
         this->stg = vs.stg;
         vs.stg    = nullptr;
-        
         return *this;
     }
     
@@ -77,7 +67,7 @@ public:
     bool empty() const{
         if (this->stg == nullptr)
             return true;
-        return !(this->stg->type != nullptr && this->stg->dest != nullptr);
+        return !(this->stg->type != nullptr);
     }
     
     template <typename Te>
@@ -91,6 +81,12 @@ public:
         return *this;
     }
     
+    template <typename Te>
+    vers &set(Te &&t){
+        this->Destroy();
+        
+    }
+    
 private:
     Storage &GetStg(){
         return *this->stg;
@@ -100,7 +96,7 @@ private:
     bool AllocateMemory_Init(const Te &t){
         if (this->empty()){
             this->GetStg().type = static_cast<Te*>(std::malloc(sizeof(Te)));
-            new(this->GetStg().type) Te(t);
+            std::construct_at<Te>(static_cast<Te*>(this->GetStg().type), t);
             this->GetStg().type_info = &typeid(t);
             
             return true;
@@ -119,8 +115,19 @@ private:
         if (!this->empty()){
             this->GetStg().dest(this->GetStg().type);
             this->GetStg().dest = nullptr;
-            std::free(this->GetStg().type);
-            this->GetStg().type = nullptr;
+            
+            if (this->GetStg().type != nullptr){
+                std::free(this->GetStg().type);
+                this->GetStg().type = nullptr;
+            }
+        }
+    }
+    
+    void DestroyEvrything(){
+        this->Destroy();
+        if (this->stg != nullptr){
+            std::free(this->stg);
+            this->stg = nullptr;
         }
     }
 };
