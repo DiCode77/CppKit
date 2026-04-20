@@ -51,10 +51,13 @@ public:
         return this->set<Te>(t);
     }
     
+    vers &operator= (const vers &vs){
+        return this->CopyStorage(this->stg, vs.stg);
+    }
+    
     vers &operator= (vers &&vs) noexcept{
         this->DestroyEvrything();
-        this->MoveStorage(&this->stg, &vs.stg);
-        return *this;
+        return this->MoveStorage(&this->stg, &vs.stg);
     }
     
     template <typename Te>
@@ -72,7 +75,7 @@ public:
         return !(this->stg->data != nullptr);
     }
     
-    template <typename Te>
+    template <typename Te> requires (!std::is_same_v<std::decay_t<Te>, dde::vers>)
     vers &set(const Te &t){
         this->Destroy();
         
@@ -83,13 +86,23 @@ public:
         return *this;
     }
     
-    template <typename Te>
-    vers &set(Te &&t){
-        this->Destroy();
-        
+    vers &set(const dde::vers &vs){
+        return this->CopyStorage(this->stg, vs.stg);
     }
     
+    vers &set(dde::vers &&vs){
+        this->DestroyEvrything();
+        return this->MoveStorage(&this->stg, &vs.stg);
+    }
+    
+    
 private:
+    Storage *CreateStorage(){
+        void *data = std::malloc(sizeof(dde::vers::Storage));
+        std::construct_at<dde::vers::Storage>(static_cast<dde::vers::Storage*>(data), nullptr, nullptr, nullptr, nullptr);
+        return static_cast<dde::vers::Storage*>(data);
+    }
+    
     Storage &GetStg(){
         return *this->stg;
     }
@@ -141,21 +154,28 @@ private:
         }
     }
     
-    void CopyStorage(Storage *tstg, const Storage *ustg){
+    dde::vers &CopyStorage(Storage *tstg, const Storage *ustg){
         if (tstg != nullptr && ustg != nullptr){
             tstg->data      = ustg->data_save(ustg->data);
             tstg->dest      = ustg->dest;
             tstg->type_info = ustg->type_info;
             tstg->data_save = ustg->data_save;
         }
+        return *this;
     }
     
-    void MoveStorage(Storage **tstg, Storage **ustg){
+    dde::vers &MoveStorage(Storage **tstg, Storage **ustg){
         // *tstg must be null; otherwise, the condition will not be met. This is important to prevent memory leaks.
         if (*tstg == nullptr && *ustg != nullptr){
             *tstg = *ustg;
             *ustg = nullptr;
         }
+        
+        if (*ustg == nullptr){
+            *ustg = this->CreateStorage();
+        }
+        
+        return *this;
     }
 };
 
