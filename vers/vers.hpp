@@ -16,14 +16,16 @@
 namespace dde{
 
 class vers{
-    using void_p_t  = void*;
-    using void_fp_t = void(*)(void*);
-    using c_type_t  = const std::type_info;
+    using void_p_t   = void*;
+    using void_fp_t  = void(*)(void*);
+    using void_cfp_t = void *(*)(const void*);
+    using c_type_t   = const std::type_info;
     
     struct Storage{
-        void_p_t  type;
-        void_fp_t dest;
-        c_type_t* type_info;
+        void_p_t   data;
+        void_fp_t  dest;
+        c_type_t   *type_info;
+        void_cfp_t data_save;
     } *stg;
     
 public:
@@ -35,11 +37,13 @@ public:
         this->set<Te>(t);
     }
     
+    vers(const vers &vs) : vers(){
+        this->CopyStorage(this->stg, vs.stg);
+    }
+    
     vers(vers &&vs) noexcept : vers(){
         this->DestroyEvrything();
-        
-        this->stg = vs.stg;
-        vs.stg    = nullptr;
+        this->MoveStorage(&this->stg, &vs.stg);
     }
     
     template <typename Te>
@@ -49,15 +53,13 @@ public:
     
     vers &operator= (vers &&vs) noexcept{
         this->DestroyEvrything();
-        
-        this->stg = vs.stg;
-        vs.stg    = nullptr;
+        this->MoveStorage(&this->stg, &vs.stg);
         return *this;
     }
     
     template <typename Te>
     Te &get(){
-        return *static_cast<Te*>(this->GetStg().type);
+        return *static_cast<Te*>(this->GetStg().data);
     }
     
     c_type_t &getTypeId(){
@@ -67,7 +69,7 @@ public:
     bool empty() const{
         if (this->stg == nullptr)
             return true;
-        return !(this->stg->type != nullptr);
+        return !(this->stg->data != nullptr);
     }
     
     template <typename Te>
@@ -95,8 +97,8 @@ private:
     template <typename Te>
     bool AllocateMemory_Init(const Te &t){
         if (this->empty()){
-            this->GetStg().type = static_cast<Te*>(std::malloc(sizeof(Te)));
-            std::construct_at<Te>(static_cast<Te*>(this->GetStg().type), t);
+            this->GetStg().data = std::malloc(sizeof(Te));
+            std::construct_at<Te>(static_cast<Te*>(this->GetStg().data), t);
             this->GetStg().type_info = &typeid(t);
             
             return true;
@@ -109,16 +111,24 @@ private:
         this->GetStg().dest = [](void_p_t p_te){
             static_cast<Te*>(p_te)->~Te();
         };
+        
+        this->GetStg().data_save = [](const void *o_type) -> void*{
+            void *type = std::malloc(sizeof(Te));
+            std::construct_at<Te>(static_cast<Te*>(type), *static_cast<const Te*>(o_type));
+            return type;
+        };
     }
     
     void Destroy(){
         if (!this->empty()){
-            this->GetStg().dest(this->GetStg().type);
+            this->GetStg().dest(this->GetStg().data);
             this->GetStg().dest = nullptr;
             
-            if (this->GetStg().type != nullptr){
-                std::free(this->GetStg().type);
-                this->GetStg().type = nullptr;
+            if (this->GetStg().data != nullptr){
+                std::free(this->GetStg().data);
+                
+                this->GetStg().data      = nullptr;
+                this->GetStg().data_save = nullptr;
             }
         }
     }
@@ -128,6 +138,23 @@ private:
         if (this->stg != nullptr){
             std::free(this->stg);
             this->stg = nullptr;
+        }
+    }
+    
+    void CopyStorage(Storage *tstg, const Storage *ustg){
+        if (tstg != nullptr && ustg != nullptr){
+            tstg->data      = ustg->data_save(ustg->data);
+            tstg->dest      = ustg->dest;
+            tstg->type_info = ustg->type_info;
+            tstg->data_save = ustg->data_save;
+        }
+    }
+    
+    void MoveStorage(Storage **tstg, Storage **ustg){
+        // *tstg must be null; otherwise, the condition will not be met. This is important to prevent memory leaks.
+        if (*tstg == nullptr && *ustg != nullptr){
+            *tstg = *ustg;
+            *ustg = nullptr;
         }
     }
 };
