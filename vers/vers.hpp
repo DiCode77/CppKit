@@ -9,7 +9,6 @@
 #define vers_hpp
 #include <typeinfo>
 #include <cstdlib>
-#include <utility>
 #include <type_traits>
 #include <memory>
 #include <stdexcept>
@@ -17,6 +16,8 @@
 namespace dde{
 
 class vers{
+    static constexpr const char *VERS_VERSION = "0.0.1";
+    
     using void_p_t   = void*;
     using void_fp_t  = void(*)(void*);
     using void_cfp_t = void *(*)(const void*);
@@ -42,23 +43,8 @@ public:
         this->CopyStorage(this->stg, vs.stg);
     }
     
-    vers(vers &&vs) noexcept : vers(){
-        this->DestroyEvrything();
+    vers(vers &&vs) noexcept : stg(nullptr){
         this->MoveStorage(&this->stg, &vs.stg);
-    }
-    
-    template <typename Te>
-    vers &operator= (const Te &t){
-        return this->set<Te>(t);
-    }
-    
-    vers &operator= (const vers &vs){
-        return this->CopyStorage(this->stg, vs.stg);
-    }
-    
-    vers &operator= (vers &&vs) noexcept{
-        this->DestroyEvrything();
-        return this->MoveStorage(&this->stg, &vs.stg);
     }
     
     template <typename Te>
@@ -68,7 +54,7 @@ public:
         return *static_cast<Te*>(this->GetStg().data);
     }
     
-    c_type_t &getTypeId(){
+    c_type_t &type(){
         return *this->GetStg().type_info;
     }
     
@@ -98,6 +84,33 @@ public:
         return this->MoveStorage(&this->stg, &vs.stg);
     }
     
+    vers &reset(){
+        this->Destroy();
+        return *this;
+    }
+    
+    vers &swap(dde::vers &vs){
+        Storage *p_sg = this->stg;
+        
+        this->stg = vs.stg;
+        vs.stg    = p_sg;
+        
+        return *this;
+    }
+    
+    template <typename Te>
+    vers &operator= (const Te &t){
+        return this->set<Te>(t);
+    }
+    
+    vers &operator= (const vers &vs){
+        return this->CopyStorage(this->stg, vs.stg);
+    }
+    
+    vers &operator= (vers &&vs) noexcept{
+        this->DestroyEvrything();
+        return this->MoveStorage(&this->stg, &vs.stg);
+    }
     
 private:
     Storage *CreateStorage(){
