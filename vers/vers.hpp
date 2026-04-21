@@ -12,6 +12,7 @@
 #include <utility>
 #include <type_traits>
 #include <memory>
+#include <stdexcept>
 
 namespace dde{
 
@@ -62,6 +63,8 @@ public:
     
     template <typename Te>
     Te &get(){
+        if (this->empty())
+            throw std::runtime_error("The 'dde::vers' type is empty!");
         return *static_cast<Te*>(this->GetStg().data);
     }
     
