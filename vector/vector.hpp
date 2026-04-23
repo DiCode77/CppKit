@@ -29,8 +29,14 @@ class vector{
     
 public:
     vector() : stg(this->CreateStorage(nullptr, 0, 0)){}
-    vector(ulong_t in_size_vec) : vector(){
+    explicit vector(const ulong_t &in_size_vec) : vector(){
         this->stg->data     = this->InitializeArray(in_size_vec, {});
+        this->stg->size     = in_size_vec;
+        this->stg->capacity = in_size_vec;
+    }
+    
+    explicit vector(const ulong_t &in_size_vec, const VecTe &t_val) : vector(){
+        this->stg->data     = this->InitializeArray(in_size_vec, t_val);
         this->stg->size     = in_size_vec;
         this->stg->capacity = in_size_vec;
     }
@@ -41,6 +47,25 @@ public:
         this->RemoveArray(this->stg->data, this->stg->capacity);
         std::free(this->stg);
     }
+    
+    bool empty() const{
+        if (this->stg == nullptr)
+            return true;
+        return this->stg->data == nullptr;
+    }
+    
+    ulong_t size() const{
+        return this->empty() ? 0 : this->stg->size;
+    }
+    
+    ulong_t capacity() const{
+        return this->empty() ? 0 : this->stg->capacity;
+    }
+    
+    VecTe &at(const ulong_t &pos){
+        return *(this->stg->data + pos);
+    }
+    
     
 private:
     Storage *CreateStorage(const data_p_t data, const ulong_t sz, const ulong_t cap){
