@@ -11,6 +11,9 @@
 | `dde::string` | Custom string implementation | 🚧 In Progress | Already sufficiently optimized for use |
 | `dde::text` | String-like type implemented as a list | ⚠️ Experimental | Not recommended for use currently |
 | `dde::vers` | Generic type capable of storing and modifying any data type at runtime | 🟢 Stable | Already works well |
+| `dde::vector` | This is a template container that implements a dynamic array. | 🚧 In Progress | Unstable |
+
+
 
 
 
