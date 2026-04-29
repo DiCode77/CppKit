@@ -114,7 +114,7 @@ public:
     
 private:
     Storage *CreateStorage(){
-        void *data = std::malloc(sizeof(dde::vers::Storage));
+        void *data = this->GetNewMemory<dde::vers::Storage>();
         std::construct_at<dde::vers::Storage>(static_cast<dde::vers::Storage*>(data), nullptr, nullptr, nullptr, nullptr);
         return static_cast<dde::vers::Storage*>(data);
     }
@@ -124,12 +124,31 @@ private:
     }
     
     template <typename Te>
+    void *GetNewMemory(){
+        size_t alig = alignof(Te);
+        size_t size = sizeof(Te);
+        
+        if (alig <= alignof(std::max_align_t)){
+            return std::malloc(size);
+        }
+        else{
+            if (size % alig != 0){
+                size += alig - (size % alig);
+            }
+        }
+        return std::aligned_alloc(alig, size);
+    }
+    
+    template <typename Te>
     bool AllocateMemory_Init(const Te &t){
         if (this->empty()){
-            this->GetStg().data = std::malloc(sizeof(Te));
-            std::construct_at<Te>(static_cast<Te*>(this->GetStg().data), t);
-            this->GetStg().type_info = &typeid(t);
-            
+            this->GetStg().data = this->GetNewMemory<Te>();
+            if (this->empty()){
+                throw std::runtime_error("Memory was not allocated!");
+            }else{
+                std::construct_at<Te>(static_cast<Te*>(this->GetStg().data), t);
+                this->GetStg().type_info = &typeid(t);
+            }
             return true;
         }
         return false;
@@ -142,7 +161,7 @@ private:
         };
         
         this->GetStg().data_save = [](const void *o_type) -> void*{
-            void *type = std::malloc(sizeof(Te));
+            void *type = dde::vers().GetNewMemory<Te>();
             std::construct_at<Te>(static_cast<Te*>(type), *static_cast<const Te*>(o_type));
             return type;
         };
