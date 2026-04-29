@@ -16,7 +16,7 @@
 namespace dde{
 
 class vers{
-    static constexpr const char *VERS_VERSION = "0.0.1";
+    static constexpr const char *VERS_VERSION = "0.0.2";
     
     using void_p_t   = void*;
     using void_fp_t  = void(*)(void*);
@@ -51,23 +51,21 @@ public:
     Te &get(){
         if (this->empty())
             throw std::runtime_error("The 'dde::vers' type is empty!");
-        return *static_cast<Te*>(this->GetStg().data);
+        return *static_cast<Te*>(this->stg->data);
     }
     
     c_type_t &type(){
-        return *this->GetStg().type_info;
+        return *this->stg->type_info;
     }
     
     bool empty() const{
         if (this->stg == nullptr)
             return true;
-        return !(this->stg->data != nullptr);
+        return this->stg->data == nullptr;
     }
     
     template <typename Te> requires (!std::is_same_v<std::decay_t<Te>, dde::vers>)
     vers &set(const Te &t){
-        this->Destroy();
-        
         using Real = std::decay_t<decltype(t)>;
         if (this->AllocateMemory_Init<Real>(t)){
             this->ImplCaptureType<Real>();
@@ -119,10 +117,6 @@ private:
         return static_cast<dde::vers::Storage*>(data);
     }
     
-    Storage &GetStg(){
-        return *this->stg;
-    }
-    
     template <typename Te>
     void *GetNewMemory(){
         size_t alig = alignof(Te);
@@ -136,31 +130,37 @@ private:
                 size += alig - (size % alig);
             }
         }
+        // This allocation method is necessary if the type for which memory needs to be allocated requires more alignment than std::malloc can provide
         return std::aligned_alloc(alig, size);
     }
     
     template <typename Te>
     bool AllocateMemory_Init(const Te &t){
-        if (this->empty()){
-            this->GetStg().data = this->GetNewMemory<Te>();
+        if (!this->stg->type_info || *this->stg->type_info != typeid(Te)){
+            this->Destroy();
+            
+            this->stg->data = this->GetNewMemory<Te>();
             if (this->empty()){
                 throw std::runtime_error("Memory was not allocated!");
             }else{
-                std::construct_at<Te>(static_cast<Te*>(this->GetStg().data), t);
-                this->GetStg().type_info = &typeid(t);
+                std::construct_at<Te>(static_cast<Te*>(this->stg->data), t);
+                this->stg->type_info = &typeid(t);
             }
             return true;
+        }
+        else{
+            *static_cast<Te*>(this->stg->data) = t;
         }
         return false;
     }
     
     template <typename Te>
     void ImplCaptureType(){
-        this->GetStg().dest = [](void_p_t p_te){
-            static_cast<Te*>(p_te)->~Te();
+        this->stg->dest = [](void_p_t p_te){
+            std::destroy_at<Te>(static_cast<Te*>(p_te));
         };
         
-        this->GetStg().data_save = [](const void *o_type) -> void*{
+        this->stg->data_save = [](const void *o_type) -> void*{
             void *type = dde::vers().GetNewMemory<Te>();
             std::construct_at<Te>(static_cast<Te*>(type), *static_cast<const Te*>(o_type));
             return type;
@@ -169,14 +169,14 @@ private:
     
     void Destroy(){
         if (!this->empty()){
-            this->GetStg().dest(this->GetStg().data);
-            this->GetStg().dest = nullptr;
+            this->stg->dest(this->stg->data);
+            this->stg->dest = nullptr;
             
-            if (this->GetStg().data != nullptr){
-                std::free(this->GetStg().data);
+            if (this->stg->data != nullptr){
+                std::free(this->stg->data);
                 
-                this->GetStg().data      = nullptr;
-                this->GetStg().data_save = nullptr;
+                this->stg->data      = nullptr;
+                this->stg->data_save = nullptr;
             }
         }
     }
