@@ -16,7 +16,7 @@ namespace dde {
 
 template <typename VecTe>
 class vector{
-    static constexpr const char *VEC_VERSION = "0.0.0-1b";
+    static constexpr const char *VEC_VERSION = "0.0.0-2b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -66,24 +66,23 @@ public:
         return *(this->stg->data + pos);
     }
     
-    vector &push_back(const VecTe &val){
-        if (!this->empty() && false){
-            if (this->size() +1 >= this->capacity()){
-                data_p_t data = static_cast<data_p_t>(std::realloc((void*)this->stg->data, sizeof(VecTe) * (this->size() +1)));
-                
-                if (data != nullptr){
-                    std::construct_at<VecTe>(data + this->size(), val);
-                    this->stg->size     += 1;
-                    this->stg->capacity += 1;
-                    
-                    this->stg->data = data;
+    void resize(const ulong_t &resize){
+        if (resize > this->capacity()){
+            this->stg->capacity = resize;
+            this->IncreaseDataVolume(&this->stg->data, this->size(), resize, this->capacity());
+        }
+        else{
+            if constexpr (!std::is_trivially_destructible_v<VecTe>){
+                for (ulong_t i = resize; i < this->size(); i++){
+                    std::destroy_at<VecTe>(this->stg->data + i);
                 }
             }
-            else{
-                
-            }
+            std::memset(reinterpret_cast<void*>(this->stg->data +resize), 0, sizeof(VecTe) * (this->size() - resize));
         }
-        
+        this->stg->size = resize;
+    }
+    
+    vector &push_back(const VecTe &val){
         this->AddItem(val);
         return *this;
     }
@@ -120,6 +119,31 @@ public:
                 }
             }
         }
+    }
+    
+    void IncreaseDataVolume(data_p_t *p_data, const ulong_t &old_size, const ulong_t &new_size, const ulong_t &cap){
+        data_p_t data   = nullptr;
+        bool is_realloc = true;
+        
+        if (std::is_trivially_copyable_v<VecTe> && alignof(VecTe) <= alignof(std::max_align_t)){
+            data = reinterpret_cast<data_p_t>(std::realloc(*p_data, sizeof(VecTe) *cap));
+        }else{
+            data = this->InitializeArray(cap, {}, false);
+            is_realloc = false;
+        }
+        
+        if (data == nullptr){
+            return;
+        }
+        else{
+            if (!is_realloc){
+                for (ulong_t i = 0; i < old_size; i++){
+                    std::construct_at<VecTe>(data +i, std::move(*((*p_data) +i)));
+                }
+                this->RemoveArray(*p_data, old_size);
+            }
+        }
+        *p_data = data;
     }
     
 private:
