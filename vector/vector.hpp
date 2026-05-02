@@ -82,6 +82,13 @@ public:
         this->stg->size = resize;
     }
     
+    void reserve(const ulong_t &resere){
+        if (resere > this->capacity()){
+            this->stg->capacity = resere;
+            
+        }
+    }
+    
     vector &push_back(const VecTe &val){
         this->AddItem(val);
         return *this;
@@ -95,55 +102,15 @@ public:
                 this->stg->capacity += 1;
             }
             else{
-                data_p_t data = nullptr;
-                if (std::is_trivially_copyable_v<VecTe> && alignof(VecTe) <= alignof(std::max_align_t)){
-                    data = static_cast<data_p_t>(std::realloc(this->stg->data, sizeof(VecTe) * (this->size() +1)));
-                }else{
-                    data = this->InitializeArray(this->size() +1, val, false);
-                    
-                    for (ulong_t i = 0; i < this->size(); i++){
-                        std::construct_at<VecTe>(data +i, std::move(*(this->stg->data +i)));
-                    }
-                    
-                    this->RemoveArray(this->stg->data, this->size());
-                }
-                
-                if (data == nullptr){
-                    return;
-                }else{
-                    std::construct_at<VecTe>(data + this->size(), val);
-                    
-                    this->stg->data      = data;
-                    this->stg->size     += 1;
+                if (this->size() +1 > this->capacity()){
                     this->stg->capacity += 1;
                 }
+                
+                this->IncreaseDataVolume(&this->stg->data, this->size(), this->size() +1, this->capacity());
+                std::construct_at<VecTe>(this->stg->data + this->size(), std::move(val));
+                this->stg->size += 1;
             }
         }
-    }
-    
-    void IncreaseDataVolume(data_p_t *p_data, const ulong_t &old_size, const ulong_t &new_size, const ulong_t &cap){
-        data_p_t data   = nullptr;
-        bool is_realloc = true;
-        
-        if (std::is_trivially_copyable_v<VecTe> && alignof(VecTe) <= alignof(std::max_align_t)){
-            data = reinterpret_cast<data_p_t>(std::realloc(*p_data, sizeof(VecTe) *cap));
-        }else{
-            data = this->InitializeArray(cap, {}, false);
-            is_realloc = false;
-        }
-        
-        if (data == nullptr){
-            return;
-        }
-        else{
-            if (!is_realloc){
-                for (ulong_t i = 0; i < old_size; i++){
-                    std::construct_at<VecTe>(data +i, std::move(*((*p_data) +i)));
-                }
-                this->RemoveArray(*p_data, old_size);
-            }
-        }
-        *p_data = data;
     }
     
 private:
@@ -175,6 +142,31 @@ private:
             return data;
         }
         return nullptr;
+    }
+    
+    void IncreaseDataVolume(data_p_t *p_data, const ulong_t &old_size, const ulong_t &new_size, const ulong_t &cap){
+        data_p_t data   = nullptr;
+        bool is_realloc = true;
+        
+        if constexpr (std::is_trivially_copyable_v<VecTe> && alignof(VecTe) <= alignof(std::max_align_t)){
+            data = reinterpret_cast<data_p_t>(std::realloc(*p_data, sizeof(VecTe) *cap));
+        }else{
+            data = this->InitializeArray(cap, {}, false);
+            is_realloc = false;
+        }
+        
+        if (data == nullptr){
+            return;
+        }
+        else{
+            if (!is_realloc){
+                for (ulong_t i = 0; i < old_size; i++){
+                    std::construct_at<VecTe>(data +i, std::move(*((*p_data) +i)));
+                }
+                this->RemoveArray(*p_data, old_size);
+            }
+        }
+        *p_data = data;
     }
     
     void RemoveArray(data_p_t data, const ulong_t &size){
