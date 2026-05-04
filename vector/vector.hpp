@@ -69,7 +69,7 @@ public:
     void resize(const ulong_t &resize){
         if (resize > this->capacity()){
             this->stg->capacity = resize;
-            this->IncreaseDataVolume(&this->stg->data, this->size(), resize, this->capacity());
+            this->IncreaseDataVolume(&this->stg->data, this->size(), this->capacity());
         }
         else{
             if constexpr (!std::is_trivially_destructible_v<VecTe>){
@@ -85,7 +85,7 @@ public:
     void reserve(const ulong_t &resere){
         if (resere > this->capacity()){
             this->stg->capacity = resere;
-            
+            this->IncreaseDataVolume(&this->stg->data, this->size(), this->capacity());
         }
     }
     
@@ -106,8 +106,8 @@ public:
                     this->stg->capacity += 1;
                 }
                 
-                this->IncreaseDataVolume(&this->stg->data, this->size(), this->size() +1, this->capacity());
-                std::construct_at<VecTe>(this->stg->data + this->size(), std::move(val));
+                this->IncreaseDataVolume(&this->stg->data, this->size(), this->capacity());
+                std::construct_at<VecTe>(this->stg->data + this->size(), val);
                 this->stg->size += 1;
             }
         }
@@ -136,15 +136,16 @@ private:
                 data = static_cast<data_p_t>(std::aligned_alloc(align, sizef));
             }
             
-            for (ulong_t i = 0; i < sizem && is_constr; i++){
-                std::construct_at<VecTe>(data + i, val);
+            if (is_constr){
+                this->ConstructObject(data, val, sizem);
             }
+            
             return data;
         }
         return nullptr;
     }
     
-    void IncreaseDataVolume(data_p_t *p_data, const ulong_t &old_size, const ulong_t &new_size, const ulong_t &cap){
+    void IncreaseDataVolume(data_p_t *p_data, const ulong_t &old_size, const ulong_t &cap){
         data_p_t data   = nullptr;
         bool is_realloc = true;
         
@@ -167,6 +168,12 @@ private:
             }
         }
         *p_data = data;
+    }
+    
+    void ConstructObject(data_p_t data, const VecTe &val, const ulong_t &size){
+        for (ulong_t i = 0; i < size; i++){
+            std::construct_at<VecTe>(data +i, val);
+        }
     }
     
     void RemoveArray(data_p_t data, const ulong_t &size){
