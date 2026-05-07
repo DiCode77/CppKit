@@ -66,6 +66,30 @@ public:
         return *(this->stg->data + pos);
     }
     
+    void resize(const ulong_t &rsize){
+        if (rsize > this->size()){
+            if (rsize >= this->capacity()){
+                ulong_t n_cap = this->GrowCapacity(rsize, this->capacity());
+                this->reserve(n_cap);
+                
+                for (ulong_t i = this->size(); i < rsize; i++){
+                    std::construct_at<VecTe>(this->stg->data +i, std::move(VecTe{}));
+                }
+            }
+            else{
+                for (ulong_t i = this->size(); i < rsize; i++){
+                    std::construct_at<VecTe>(this->stg->data +i, std::move(VecTe{}));
+                }
+            }
+        }else{
+            for (ulong_t i = rsize; i < this->size(); i++){
+                std::destroy_at<VecTe>(this->stg->data +i);
+            }
+            std::memset(reinterpret_cast<void*>(this->stg->data + rsize), 0, sizeof(VecTe)  * (this->size() - rsize));
+        }
+        this->stg->size = rsize;
+    }
+    
     void reserve(const ulong_t &rcap){
         if (rcap > this->capacity()){
             if (this->capacity() == 0){
@@ -139,6 +163,17 @@ private:
             return r_pair;
         }
         return { nullptr, design::null };
+    }
+    
+    ulong_t GrowCapacity(const ulong_t &size, const ulong_t &cap){
+        ulong_t n_cap = (cap == 0 ? 1 : cap);
+        while (size >= n_cap) {
+            if (n_cap > std::numeric_limits<ulong_t>::max() / 2){
+                return std::numeric_limits<ulong_t>::max();
+            }
+            n_cap *= 2;
+        }
+        return n_cap;
     }
     
     void RemoveArray(data_p_t data, const ulong_t &size){
