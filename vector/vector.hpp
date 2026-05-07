@@ -13,6 +13,13 @@
 #include <initializer_list>
 #include <utility>
 
+// This check is necessary because the code uses “implicit-lifetime types”, which have been supported since the 20th standard.
+#if __cplusplus >= 202002L
+constexpr bool IMPLICT_LIFETIME_TYPE = true;
+#else
+constexpr bool IMPLICT_LIFETIME_TYPE = false;
+#endif
+
 namespace dde {
 
 template <typename VecTe>
@@ -66,24 +73,47 @@ public:
         return *(this->stg->data + pos);
     }
     
-    void resize(const ulong_t &rsize){
+    void resize(const ulong_t &rsize, const VecTe &val = {}){
         if (rsize > this->size()){
             if (rsize >= this->capacity()){
                 ulong_t n_cap = this->GrowCapacity(rsize, this->capacity());
                 this->reserve(n_cap);
                 
-                for (ulong_t i = this->size(); i < rsize; i++){
-                    std::construct_at<VecTe>(this->stg->data +i, std::move(VecTe{}));
+                // This is a test. I'm testing the code's execution speed and optimization.
+                if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+                    if (val != VecTe{}){
+                        for (ulong_t i = this->size(); i < rsize; i++){
+                            *(this->stg->data +i) = val;
+                        }
+                    }else{
+                        std::memset(reinterpret_cast<void*>(this->stg->data), 0, sizeof(VecTe) * (rsize - this->size()));
+                    }
+                }else{
+                    for (ulong_t i = this->size(); i < rsize; i++){
+                        std::construct_at<VecTe>(this->stg->data +i, val);
+                    }
                 }
             }
             else{
-                for (ulong_t i = this->size(); i < rsize; i++){
-                    std::construct_at<VecTe>(this->stg->data +i, std::move(VecTe{}));
+                if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+                    if (val != VecTe{}){
+                        for (ulong_t i = this->size(); i < rsize; i++){
+                            *(this->stg->data +i) = val;
+                        }
+                    }else{
+                        std::memset(reinterpret_cast<void*>(this->stg->data), 0, sizeof(VecTe) * (rsize - this->size()));
+                    }
+                }else{
+                    for (ulong_t i = this->size(); i < rsize; i++){
+                        std::construct_at<VecTe>(this->stg->data +i, val);
+                    }
                 }
             }
         }else{
-            for (ulong_t i = rsize; i < this->size(); i++){
-                std::destroy_at<VecTe>(this->stg->data +i);
+            if constexpr (!std::is_trivially_destructible_v<VecTe>){
+                for (ulong_t i = rsize; i < this->size(); i++){
+                    std::destroy_at<VecTe>(this->stg->data +i);
+                }
             }
             std::memset(reinterpret_cast<void*>(this->stg->data + rsize), 0, sizeof(VecTe)  * (this->size() - rsize));
         }
@@ -132,7 +162,7 @@ private:
             
             std::pair<data_p_t, design> r_pair;
             
-            if constexpr(std::is_trivially_copyable_v<VecTe>){
+            if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe>){
                 data = std::realloc(old_data, sizef);
                 
                 if (data == nullptr){
@@ -174,6 +204,13 @@ private:
             n_cap *= 2;
         }
         return n_cap;
+    }
+    
+    void SetStorageData(const ulong_t &size, const ulong_t &cap){
+        if (this->IsStorage()){
+            this->stg->size     = size;
+            this->stg->capacity = cap;
+        }
     }
     
     void RemoveArray(data_p_t data, const ulong_t &size){
