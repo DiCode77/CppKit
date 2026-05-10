@@ -44,9 +44,11 @@ class vector{
 public:
     vector() : stg(this->CreateStorage(nullptr, 0, 0)){}
     explicit vector(const ulong_t &in_size_vec) : vector(){
+        this->resize(in_size_vec);
     }
     
     explicit vector(const ulong_t &in_size_vec, const VecTe &t_val) : vector(){
+        this->resize(in_size_vec, t_val);
     }
     
     vector(std::initializer_list<VecTe> list) : vector(){}
@@ -86,7 +88,7 @@ public:
                             *(this->stg->data +i) = val;
                         }
                     }else{
-                        std::memset(reinterpret_cast<void*>(this->stg->data), 0, sizeof(VecTe) * (rsize - this->size()));
+                        std::memset(reinterpret_cast<void*>(this->stg->data + this->size()), 0, sizeof(VecTe) * (rsize - this->size()));
                     }
                 }else{
                     for (ulong_t i = this->size(); i < rsize; i++){
@@ -115,7 +117,9 @@ public:
                     std::destroy_at<VecTe>(this->stg->data +i);
                 }
             }
-            std::memset(reinterpret_cast<void*>(this->stg->data + rsize), 0, sizeof(VecTe)  * (this->size() - rsize));
+            if (rsize != this->size()){
+                std::memset(reinterpret_cast<void*>(this->stg->data + rsize), 0, sizeof(VecTe)  * (this->size() - rsize));
+            }
         }
         this->stg->size = rsize;
     }
