@@ -149,6 +149,21 @@ public:
         }
     }
     
+    void push_back(const VecTe &val){
+        if (this->size() +1 > this->capacity()){
+            ulong_t cap = this->GrowCapacity(this->size() +1, this->capacity());
+            this->reserve(cap);
+        }
+        
+        if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+            *(this->stg->data + this->size()) = val;
+        }else{
+            std::construct_at<VecTe>(this->stg->data + this->size(), val);
+        }
+        
+        this->stg->size++;
+    }
+    
     
 private:
     Storage *CreateStorage(const data_p_t data, const ulong_t sz, const ulong_t cap){
