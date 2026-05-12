@@ -12,6 +12,7 @@
 #include <memory>
 #include <initializer_list>
 #include <utility>
+#include <stdexcept>
 
 // This check is necessary because the code uses “implicit-lifetime types”, which have been supported since the 20th standard.
 #if __cplusplus >= 202002L
@@ -24,7 +25,7 @@ namespace dde {
 
 template <typename VecTe>
 class vector{
-    static constexpr const char *VEC_VERSION = "0.0.0-4b";
+    static constexpr const char *VEC_VERSION = "0.0.0-5b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -89,11 +90,22 @@ public:
     }
     
     VecTe &at(const ulong_t &pos){
+        if (pos >= this->size()){
+            throw std::runtime_error("Termination due to an out-of-bounds error!");
+        }
         return *(this->stg->data + pos);
     }
     
     const VecTe &at(const ulong_t &pos) const{
+        if (pos >= this->size()){
+            throw std::runtime_error("Termination due to an out-of-bounds error!");
+        }
         return *(this->stg->data + pos);
+    }
+    
+    void clear(){
+        this->DestroyArray(this->stg->data, this->size());
+        this->stg->size = 0;
     }
     
     void resize(const ulong_t &rsize, const VecTe &val = {}){
@@ -185,6 +197,17 @@ public:
         this->stg->size++;
     }
     
+    void pop_back(){
+        if (this->size() > 0){
+            this->DestroyArray(this->stg->data + this->size() -1, 1);
+            this->stg->size--;
+        }
+    }
+    
+    VecTe &operator[] (const ulong_t &index){
+        return this->at(index);
+    }
+    
     
 private:
     Storage *CreateStorage(const data_p_t data, const ulong_t sz, const ulong_t cap){
@@ -255,13 +278,23 @@ private:
     
     void RemoveArray(data_p_t data, const ulong_t &size){
         if (data != nullptr){
-            if constexpr (!std::is_trivially_destructible_v<VecTe>){
+            this->DestroyArray(data, size);
+            std::free(data);
+            this->stg->data = nullptr;
+        }
+    }
+    
+    void DestroyArray(data_p_t data, const ulong_t &size){
+        if (data != nullptr){
+            if constexpr (std::is_trivially_destructible_v<VecTe>){
+                if (size > 0){
+                    std::memset(reinterpret_cast<void*>(data), 0, sizeof(VecTe) * size);
+                }
+            }else{
                 for (ulong_t i = 0; i < size; i++){
                     std::destroy_at(data + i);
                 }
             }
-            std::free(data);
-            this->stg->data = nullptr;
         }
     }
     
