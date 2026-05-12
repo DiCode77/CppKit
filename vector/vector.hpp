@@ -24,7 +24,7 @@ namespace dde {
 
 template <typename VecTe>
 class vector{
-    static constexpr const char *VEC_VERSION = "0.0.0-3b";
+    static constexpr const char *VEC_VERSION = "0.0.0-4b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -51,7 +51,24 @@ public:
         this->resize(in_size_vec, t_val);
     }
     
-    vector(std::initializer_list<VecTe> list) : vector(){}
+    vector(std::initializer_list<VecTe> list) : vector(){
+        this->reserve(this->GrowCapacity(list.size(), this->capacity()));
+        for (auto it = list.begin(); it != list.end(); it++){
+            this->push_back(*it);
+        }
+    }
+    
+    vector(const vector &l_val) : vector(){
+        this->reserve(l_val.capacity());
+        for (ulong_t i = 0; i < l_val.size(); i++){
+            this->push_back(l_val.at(i));
+        }
+    }
+    
+    vector(vector &&r_val) noexcept : vector(){
+        // It's just a test, but the thing is, this type of storage should always be there, so there's no point in creating it separately; it would be faster to just swap them.
+        std::swap<Storage*>(this->stg, r_val.stg);
+    }
     
     ~vector(){
         this->Destroy();
@@ -72,6 +89,10 @@ public:
     }
     
     VecTe &at(const ulong_t &pos){
+        return *(this->stg->data + pos);
+    }
+    
+    const VecTe &at(const ulong_t &pos) const{
         return *(this->stg->data + pos);
     }
     
