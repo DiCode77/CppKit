@@ -78,7 +78,7 @@ public:
     bool empty() const{
         if (this->stg == nullptr)
             return true;
-        return this->stg->data == nullptr;
+        return !(this->size() > 0);
     }
     
     ulong_t size() const{
@@ -267,13 +267,6 @@ private:
             n_cap *= 2;
         }
         return n_cap;
-    }
-    
-    void SetStorageData(const ulong_t &size, const ulong_t &cap){
-        if (this->IsStorage()){
-            this->stg->size     = size;
-            this->stg->capacity = cap;
-        }
     }
     
     void RemoveArray(data_p_t data, const ulong_t &size){
