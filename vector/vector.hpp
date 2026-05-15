@@ -25,7 +25,7 @@ namespace dde {
 
 template <typename VecTe>
 class vector{
-    static constexpr const char *VEC_VERSION = "0.0.0-5b";
+    static constexpr const char *VEC_VERSION = "0.0.0-6b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -191,12 +191,28 @@ public:
             this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
         }
         
-        if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
-            *(this->stg->data + this->size()) = val;
-        }else{
-            std::construct_at<VecTe>(this->stg->data + this->size(), val);
+        if (this->AppendToTheArray(this->stg->data, this->size(), val)){
+            this->stg->size++;
+        }
+    }
+    
+    void push_back(VecTe &&val) {
+        if (this->size() +1 > this->capacity()){
+            this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
         }
         
+        if (this->AppendToTheArray(this->stg->data, this->size(), std::move(val))){
+            this->stg->size++;
+        }
+    }
+    
+    template <typename... Te>
+    void emplace_back(Te &&...t){
+        if (this->size() +1 > this->capacity()){
+            this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
+        }
+        
+        std::construct_at<VecTe>(this->stg->data + this->size(), std::forward<Te>(t)...);
         this->stg->size++;
     }
     
@@ -218,6 +234,19 @@ private:
         // This feature is optional since the Storage structure is trivial, but this exception only applies to compilers that support the C20 standard and later.
         std::construct_at<Storage>(p_stg, data, sz, cap); //
         return p_stg;
+    }
+    
+    template <typename Te>
+    bool AppendToTheArray(data_p_t data, const ulong_t &pos, Te &&val){
+        if(data != nullptr){
+            if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+                *(this->stg->data + this->size()) = std::forward<Te>(val);
+            }else{
+                std::construct_at<VecTe>(data + pos, std::forward<Te>(val));
+            }
+            return true;
+        }
+        return false;
     }
     
     std::pair<data_p_t, design> AllocateMemory(data_p_t old_data, const ulong_t &cap){
