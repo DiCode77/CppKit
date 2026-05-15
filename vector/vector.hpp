@@ -78,15 +78,19 @@ public:
     bool empty() const{
         if (this->stg == nullptr)
             return true;
-        return !(this->size() > 0);
+        return !(this->stg->size > 0);
     }
     
     ulong_t size() const{
-        return this->empty() ? 0 : this->stg->size;
+        if (this->stg == nullptr)
+            return 0;
+        return this->stg->size;
     }
     
     ulong_t capacity() const{
-        return this->empty() ? 0 : this->stg->capacity;
+        if (this->stg == nullptr)
+            return 0;
+        return this->stg->capacity;
     }
     
     VecTe &at(const ulong_t &pos){
@@ -301,11 +305,11 @@ private:
         }
     }
     
-    bool IsStorage() const{
+    inline bool IsStorage() const{
         return this->stg != nullptr;
     }
     
-    bool IsStorageData() const{
+    inline bool IsStorageData() const{
         return this->stg->data != nullptr;
     }
     
