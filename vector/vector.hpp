@@ -175,11 +175,11 @@ public:
                     for (ulong_t i = 0; i < this->size(); i++){
                         std::construct_at<VecTe>(r_pair.first + i, std::move(*(this->stg->data + i)));
                     }
-                    this->RemoveArray(this->stg->data, this->size());
+                    this->RemoveArray(&this->stg->data, this->size());
                     this->stg->data = r_pair.first;
                 }
                 else{
-                    return;
+                    this->RemoveArray(&r_pair.first, 0);
                 }
             }
             this->stg->capacity = rcap;
@@ -188,8 +188,7 @@ public:
     
     void push_back(const VecTe &val){
         if (this->size() +1 > this->capacity()){
-            ulong_t cap = this->GrowCapacity(this->size() +1, this->capacity());
-            this->reserve(cap);
+            this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
         }
         
         if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
@@ -273,11 +272,11 @@ private:
         return n_cap;
     }
     
-    void RemoveArray(data_p_t data, const ulong_t &size){
-        if (data != nullptr){
-            this->DestroyArray(data, size);
-            std::free(data);
-            this->stg->data = nullptr;
+    void RemoveArray(data_p_t *data, const ulong_t &size){
+        if (*data != nullptr){
+            this->DestroyArray(*data, size);
+            std::free(*data);
+            *data = nullptr;
         }
     }
     
@@ -298,7 +297,7 @@ private:
     void Destroy(){
         if (this->IsStorage()){
             if (this->IsStorageData()){
-                this->RemoveArray(this->stg->data, this->stg->size);
+                this->RemoveArray(&this->stg->data, this->stg->size);
             }
             std::free(this->stg);
             this->stg = nullptr;
