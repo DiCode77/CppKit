@@ -26,7 +26,7 @@ namespace dde {
 
 template <typename VecTe>
 class vector{
-    static constexpr const char *VEC_VERSION = "0.0.0-6b";
+    static constexpr const char *VEC_VERSION = "0.0.0-7b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -129,6 +129,10 @@ public:
         return *(this->stg->data + (this->size() -1));
     }
     
+    ulong_t max_size() const{
+        return std::numeric_limits<ulong_t>::max();
+    }
+    
     void clear(){
         this->DestroyArray(this->stg->data, this->size());
         this->stg->size = 0;
@@ -218,7 +222,7 @@ public:
         }
     }
     
-    void push_back(VecTe &&val) {
+    void push_back(VecTe &&val) noexcept{
         if (this->size() +1 > this->capacity()){
             this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
         }
@@ -266,10 +270,36 @@ public:
         }
     }
     
+    void swap(vector<VecTe> &vec){
+        std::swap<Storage*>(this->stg, vec.stg);
+    }
+    
     VecTe &operator[] (const ulong_t &index){
         return this->at(index);
     }
     
+    vector &operator= (const vector<VecTe> &l_value){
+        this->clear();
+        for (ulong_t i = 0; i < l_value.size(); i++){
+            this->push_back(l_value.at(i));
+        }
+        
+        return *this;
+    }
+    
+    vector &operator= (vector<VecTe> &&r_value) noexcept{
+        this->clear();
+        std::swap(this->stg, r_value.stg); // That's not quite right; I'll fix it a little later.
+        
+        return *this;
+    }
+    
+    vector &operator= (const std::initializer_list<VecTe> &list){
+        this->clear();
+        this->append_list(list);
+        
+        return *this;
+    }
     
 private:
     Storage *CreateStorage(const data_p_t data, const ulong_t sz, const ulong_t cap){
