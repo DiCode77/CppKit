@@ -14,7 +14,7 @@
 #include <utility>
 #include <stdexcept>
 #include <type_traits>
-#include <iostream>
+
 // This check is necessary because the code uses “implicit-lifetime types”, which have been supported since the 20th standard.
 #if __cplusplus >= 202002L
 constexpr bool IMPLICT_LIFETIME_TYPE = true;
@@ -106,6 +106,27 @@ public:
             throw std::runtime_error("Termination due to an out-of-bounds error!");
         }
         return *(this->stg->data + pos);
+    }
+    
+    data_p_t data(){
+        if (this->empty()){
+            throw std::runtime_error("The `data()` method cannot be called because `dde::vector` is empty!");
+        }
+        return this->stg->data;
+    }
+    
+    VecTe &front(){
+        if (this->empty()){
+            throw std::runtime_error("The `front()` method cannot be called because `dde::vector` is empty!");
+        }
+        return *this->stg->data;
+    }
+    
+    VecTe &back(){
+        if (this->empty()){
+            throw std::runtime_error("The `back()` method cannot be called because `dde::vector` is empty!");
+        }
+        return *(this->stg->data + (this->size() -1));
     }
     
     void clear(){
