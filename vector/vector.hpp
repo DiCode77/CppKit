@@ -14,7 +14,7 @@
 #include <utility>
 #include <stdexcept>
 #include <type_traits>
-
+#include <iostream>
 // This check is necessary because the code uses “implicit-lifetime types”, which have been supported since the 20th standard.
 #if __cplusplus >= 202002L
 constexpr bool IMPLICT_LIFETIME_TYPE = true;
@@ -217,6 +217,15 @@ public:
                 this->push_back(*it);
             }
         }
+    }
+    
+    template <typename ...Te> requires ((... && std::is_convertible_v<Te, VecTe>) && sizeof...(Te) > 0)
+    void append_va(Te &&...args){
+        if (this->size() +sizeof...(args) > this->capacity()){
+            this->reserve(this->GrowCapacity(this->size() +sizeof...(args), this->capacity()));
+        }
+        
+        (this->push_back(std::forward<Te>(args)), ...);
     }
     
     template <typename... Te>
