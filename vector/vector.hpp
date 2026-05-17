@@ -13,6 +13,7 @@
 #include <initializer_list>
 #include <utility>
 #include <stdexcept>
+#include <type_traits>
 
 // This check is necessary because the code uses “implicit-lifetime types”, which have been supported since the 20th standard.
 #if __cplusplus >= 202002L
@@ -203,6 +204,18 @@ public:
         
         if (this->AppendToTheArray(this->stg->data, this->size(), std::move(val))){
             this->stg->size++;
+        }
+    }
+    
+    void append_list(const std::initializer_list<VecTe> &list){
+        if (list.size() > 0){
+            if (this->size() +list.size() > this->capacity()){
+                this->reserve(this->GrowCapacity(this->size() +list.size(), this->capacity()));
+            }
+            
+            for (auto it = list.begin(); it != list.end(); it++){
+                this->push_back(*it);
+            }
         }
     }
     
