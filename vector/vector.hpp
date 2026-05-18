@@ -301,6 +301,20 @@ public:
         return *this;
     }
     
+    void insert(const ulong_t &pos, const VecTe &val){
+        if (this->size() +1 > this->capacity()){
+            this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
+        }
+        
+        for (ulong_t i = this->size(); i >= pos; i--){
+            std::construct_at<VecTe>(this->stg->data +i, std::move(*(this->stg->data +(i -1))));
+        }
+        
+        std::construct_at(this->stg->data +pos, val);
+        
+        this->stg->size++;
+    }
+    
 private:
     Storage *CreateStorage(const data_p_t data, const ulong_t sz, const ulong_t cap){
         Storage *p_stg = static_cast<Storage*>(std::malloc(sizeof(Storage)));
