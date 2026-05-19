@@ -80,7 +80,7 @@ dde::string &dde::string::print(){
 }
 
 dde::string &dde::string::printn(){
-    std::print("{}\n", this->c_str());
+    std::println("{}", this->c_str());
     return *this;
 }
 
