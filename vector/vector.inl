@@ -260,17 +260,65 @@ void dde::vector<VecTe>::append_va(Te &&...args){
 
 template <typename VecTe>
 void dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const VecTe &val){
-    if (this->size() +1 > this->capacity()){
-        this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
+    this->insert(pos, {val});
+}
+
+template <typename VecTe>
+void dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const std::initializer_list<VecTe> &list){
+    if (pos < this->size()){
+        if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+            ulong_t   cap = this->capacity();
+            data_p_t _new = nullptr;
+            
+            if (this->size() +list.size() > cap){
+                cap = this->GrowCapacity(this->size() +list.size(), cap);
+            }
+            
+            _new = this->AllocateMemory(nullptr, cap).first;
+            
+            if (_new != nullptr){
+                ulong_t inc = 0;
+                for (auto it = list.begin(); it != list.end(); it++, inc++){
+                    *(_new + (pos + inc)) = *it;
+                }
+                
+                if (pos > 0){
+                    std::memcpy(reinterpret_cast<void*>(_new), reinterpret_cast<void*>(this->stg->data), sizeof(VecTe) * pos);
+                }
+                
+                if (pos +1 <= this->size()){
+                    std::memcpy(reinterpret_cast<void*>(_new + (pos +list.size())), reinterpret_cast<void*>(this->stg->data + pos), sizeof(VecTe) * (this->size() - pos));
+                }
+                
+                this->RemoveArray(&this->stg->data, 0);
+                this->stg->data     = _new;
+                this->stg->capacity = cap;
+                this->stg->size += list.size();
+            }
+        }else{
+            if (this->size() +1 > this->capacity()){
+                this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
+            }
+            
+            // Let's create a few additional objects.
+            for (ulong_t i = this->size(); i < this->size() + list.size(); i++){
+                std::construct_at<VecTe>(this->stg->data + i, VecTe{});
+            }
+
+            for (ulong_t i = this->size() + list.size() -1; i > pos; i--){
+                *(this->stg->data + i) = std::move(*(this->stg->data + (i -list.size())));
+            }
+
+            for (ulong_t i = pos; i < pos + list.size(); i++){
+                *(this->stg->data +i) = *(list.begin() + (i - pos));
+            }
+            
+            this->stg->size += list.size();
+        }
     }
-    
-    for (ulong_t i = this->size(); i >= pos; i--){
-        std::construct_at<VecTe>(this->stg->data +i, std::move(*(this->stg->data +(i -1))));
+    else{
+        this->append_list(list);
     }
-    
-    std::construct_at(this->stg->data +pos, val);
-    
-    this->stg->size++;
 }
 
 template <typename VecTe>
@@ -335,7 +383,8 @@ bool dde::vector<VecTe>::AppendToTheArray(dde::vector<VecTe>::data_p_t data, con
 }
 
 template <typename VecTe>
-std::pair<typename dde::vector<VecTe>::data_p_t, typename dde::vector<VecTe>::design> dde::vector<VecTe>::AllocateMemory(dde::vector<VecTe>::data_p_t old_data, const dde::vector<VecTe>::ulong_t &cap){
+std::pair<typename dde::vector<VecTe>::data_p_t, typename dde::vector<VecTe>::design>
+dde::vector<VecTe>::AllocateMemory(dde::vector<VecTe>::data_p_t old_data, const dde::vector<VecTe>::ulong_t &cap){
     if (cap > 0){
         void    *data   = nullptr;
         ulong_t  align  = alignof(VecTe);

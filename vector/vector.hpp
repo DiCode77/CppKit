@@ -79,6 +79,7 @@ public:
     void append_va(Te &&...args);
     
     void insert(const ulong_t&, const VecTe&);
+    void insert(const ulong_t&, const std::initializer_list<VecTe>&);
     
     void swap(vector<VecTe>&);
     
