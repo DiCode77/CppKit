@@ -27,7 +27,7 @@ constexpr bool IMPLICT_LIFETIME_TYPE = false;
 template <typename VecTe>
 class vector{
 public:
-    static constexpr const char *VEC_VERSION = "0.0.0-7b";
+    static constexpr const char *VEC_VERSION = "0.0.0-8b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -64,24 +64,25 @@ public:
     VecTe&    front();
     VecTe&    back();
     ulong_t   max_size() const;
-    void      clear();
+    vector&   clear();
     
-    void resize(const ulong_t&, const VecTe& = {});
-    void reserve(const ulong_t&);
+    vector &resize(const ulong_t&, const VecTe& = {});
+    vector &reserve(const ulong_t&);
     
-    void push_back(const VecTe&);
-    void push_back(VecTe&&) noexcept;
-    template <typename... Te> void emplace_back(Te &&...t);
-    void pop_back();
+    vector &push_back(const VecTe&);
+    vector &push_back(VecTe&&) noexcept;
+    template <typename... Te> vector &emplace_back(Te &&...t);
+    vector &pop_back();
     
-    void append_list(const std::initializer_list<VecTe>&);
+    vector &append_list(const std::initializer_list<VecTe>&);
     template <typename ...Te> requires ((... && std::is_convertible_v<Te, VecTe>) && sizeof...(Te) > 0)
-    void append_va(Te &&...args);
+    vector &append_va(Te &&...args);
     
-    void insert(const ulong_t&, const VecTe&);
-    void insert(const ulong_t&, const std::initializer_list<VecTe>&);
+    // As for the insert methods, this is an experimental implementation that is currently being tested.
+    vector &insert(const ulong_t&, const VecTe&);
+    vector &insert(const ulong_t&, const std::initializer_list<VecTe>&);
     
-    void swap(vector<VecTe>&);
+    vector &swap(vector<VecTe>&);
     
     VecTe  &operator[] (const ulong_t&);
     vector &operator= (const vector<VecTe>&);

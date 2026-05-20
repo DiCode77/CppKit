@@ -113,13 +113,14 @@ dde::vector<VecTe>::ulong_t dde::vector<VecTe>::max_size() const{
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::clear(){
+dde::vector<VecTe> &dde::vector<VecTe>::clear(){
     this->DestroyArray(this->stg->data, this->size());
     this->stg->size = 0;
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::resize(const dde::vector<VecTe>::ulong_t &rsize, const VecTe &val){
+dde::vector<VecTe> &dde::vector<VecTe>::resize(const dde::vector<VecTe>::ulong_t &rsize, const VecTe &val){
     if (rsize > this->size()){
         if (rsize >= this->capacity()){
             ulong_t n_cap = this->GrowCapacity(rsize, this->capacity());
@@ -166,10 +167,11 @@ void dde::vector<VecTe>::resize(const dde::vector<VecTe>::ulong_t &rsize, const 
         }
     }
     this->stg->size = rsize;
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::reserve(const dde::vector<VecTe>::ulong_t &rcap){
+dde::vector<VecTe> &dde::vector<VecTe>::reserve(const dde::vector<VecTe>::ulong_t &rcap){
     if (rcap > this->capacity()){
         if (this->capacity() == 0){
             this->stg->data = this->AllocateMemory(this->stg->data, rcap).first;
@@ -192,10 +194,11 @@ void dde::vector<VecTe>::reserve(const dde::vector<VecTe>::ulong_t &rcap){
         }
         this->stg->capacity = rcap;
     }
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::push_back(const VecTe &val){
+dde::vector<VecTe> &dde::vector<VecTe>::push_back(const VecTe &val){
     if (this->size() +1 > this->capacity()){
         this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
     }
@@ -203,10 +206,11 @@ void dde::vector<VecTe>::push_back(const VecTe &val){
     if (this->AppendToTheArray(this->stg->data, this->size(), val)){
         this->stg->size++;
     }
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::push_back(VecTe &&val) noexcept{
+dde::vector<VecTe> &dde::vector<VecTe>::push_back(VecTe &&val) noexcept{
     if (this->size() +1 > this->capacity()){
         this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
     }
@@ -214,29 +218,32 @@ void dde::vector<VecTe>::push_back(VecTe &&val) noexcept{
     if (this->AppendToTheArray(this->stg->data, this->size(), std::move(val))){
         this->stg->size++;
     }
+    return *this;
 }
 
 template <typename VecTe>
 template <typename... Te>
-void dde::vector<VecTe>::emplace_back(Te &&...t){
+dde::vector<VecTe> &dde::vector<VecTe>::emplace_back(Te &&...t){
     if (this->size() +1 > this->capacity()){
         this->reserve(this->GrowCapacity(this->size() +1, this->capacity()));
     }
     
     std::construct_at<VecTe>(this->stg->data + this->size(), std::forward<Te>(t)...);
     this->stg->size++;
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::pop_back(){
+dde::vector<VecTe> &dde::vector<VecTe>::pop_back(){
     if (this->size() > 0){
         this->DestroyArray(this->stg->data + this->size() -1, 1);
         this->stg->size--;
     }
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::append_list(const std::initializer_list<VecTe> &list){
+dde::vector<VecTe> &dde::vector<VecTe>::append_list(const std::initializer_list<VecTe> &list){
     if (list.size() > 0){
         if (this->size() +list.size() > this->capacity()){
             this->reserve(this->GrowCapacity(this->size() +list.size(), this->capacity()));
@@ -246,25 +253,28 @@ void dde::vector<VecTe>::append_list(const std::initializer_list<VecTe> &list){
             this->push_back(*it);
         }
     }
+    return *this;
 }
 
 template <typename VecTe>
 template <typename ...Te> requires ((... && std::is_convertible_v<Te, VecTe>) && sizeof...(Te) > 0)
-void dde::vector<VecTe>::append_va(Te &&...args){
+dde::vector<VecTe> &dde::vector<VecTe>::append_va(Te &&...args){
     if (this->size() +sizeof...(args) > this->capacity()){
         this->reserve(this->GrowCapacity(this->size() +sizeof...(args), this->capacity()));
     }
     
     (this->push_back(std::forward<Te>(args)), ...);
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const VecTe &val){
+dde::vector<VecTe> &dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const VecTe &val){
     this->insert(pos, {val});
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const std::initializer_list<VecTe> &list){
+dde::vector<VecTe> &dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const std::initializer_list<VecTe> &list){
     if (pos < this->size()){
         if constexpr(std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
             ulong_t   cap = this->capacity();
@@ -319,11 +329,13 @@ void dde::vector<VecTe>::insert(const dde::vector<VecTe>::ulong_t &pos, const st
     else{
         this->append_list(list);
     }
+    return *this;
 }
 
 template <typename VecTe>
-void dde::vector<VecTe>::swap(dde::vector<VecTe> &vec){
+dde::vector<VecTe> &dde::vector<VecTe>::swap(dde::vector<VecTe> &vec){
     std::swap<Storage*>(this->stg, vec.stg);
+    return *this;
 }
 
 template <typename VecTe>
