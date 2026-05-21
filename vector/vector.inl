@@ -339,40 +339,57 @@ dde::vector<VecTe> &dde::vector<VecTe>::swap(dde::vector<VecTe> &vec){
 }
 
 template <typename VecTe>
-dde::vector<VecTe> &dde::vector<VecTe>::revise(const dde::vector<VecTe>::ulong_t &in_size){
+dde::vector<VecTe> &dde::vector<VecTe>::assign(const dde::vector<VecTe>::ulong_t &in_size){
     this->clear();
     this->resize(in_size);
     return *this;
 }
 
 template <typename VecTe>
-dde::vector<VecTe> &dde::vector<VecTe>::revice(const dde::vector<VecTe>::ulong_t &in_size, const VecTe &val){
+dde::vector<VecTe> &dde::vector<VecTe>::assign(const dde::vector<VecTe>::ulong_t &in_size, const VecTe &val){
     this->clear();
     this->resize(in_size, val);
     return *this;
 }
 
 template <typename VecTe>
-dde::vector<VecTe> &dde::vector<VecTe>::revice(const std::initializer_list<VecTe> &list){
+dde::vector<VecTe> &dde::vector<VecTe>::assign(const std::initializer_list<VecTe> &list){
     this->clear();
     this->append_list(list);
     return *this;
 }
 
 template <typename VecTe>
-dde::vector<VecTe> &dde::vector<VecTe>::revice(const vector<VecTe> &l_value){
+dde::vector<VecTe> &dde::vector<VecTe>::assign(const vector<VecTe> &l_value){
     this->clear();
     this->reserve(l_value.capacity());
     
     for (ulong_t i = 0; i < l_value.size(); i++){
-        this->push_back(l_value);
+        this->push_back(l_value.at(i));
     }
     return *this;
 }
 
 template <typename VecTe>
-dde::vector<VecTe> &dde::vector<VecTe>::revice(vector<VecTe> &&r_value){
+dde::vector<VecTe> &dde::vector<VecTe>::assign(vector<VecTe> &&r_value) noexcept{
+    this->clear();
     this->swap(r_value);
+    return *this;
+}
+
+template <typename VecTe>
+template <typename Te>
+dde::vector<VecTe> &dde::vector<VecTe>::run_func(Te &&func){
+    if constexpr (std::is_void_v<decltype(func(*this))>){
+        func(*this);
+    }else{
+        auto res = func(*this);
+        if constexpr (typeid(res) == typeid(vector)){
+            this->assign(res);
+        }else{
+            this->assign(1, res);
+        }
+    }
     return *this;
 }
 

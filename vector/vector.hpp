@@ -27,7 +27,7 @@ constexpr bool IMPLICT_LIFETIME_TYPE = false;
 template <typename VecTe>
 class vector{
 public:
-    static constexpr const char *VEC_VERSION = "0.0.0-8b";
+    static constexpr const char *VEC_VERSION = "0.0.0-9b";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -85,11 +85,14 @@ public:
     vector &swap(vector<VecTe>&);
     
     // These are methods for completely redefining a vector with new values, while preserving its capacity.
-    vector &revise(const ulong_t&);
-    vector &revice(const ulong_t&, const VecTe&);
-    vector &revice(const std::initializer_list<VecTe>&);
-    vector &revice(const vector&);
-    vector &revice(vector&&);
+    vector &assign(const ulong_t&);
+    vector &assign(const ulong_t&, const VecTe&);
+    vector &assign(const std::initializer_list<VecTe>&);
+    vector &assign(const vector&);
+    vector &assign(vector&&) noexcept;
+    
+    template <typename Te>
+    vector &run_func(Te&&);
     
     VecTe  &operator[] (const ulong_t&);
     vector &operator= (const vector<VecTe>&);
