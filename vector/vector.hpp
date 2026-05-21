@@ -84,6 +84,13 @@ public:
     
     vector &swap(vector<VecTe>&);
     
+    // These are methods for completely redefining a vector with new values, while preserving its capacity.
+    vector &revise(const ulong_t&);
+    vector &revice(const ulong_t&, const VecTe&);
+    vector &revice(const std::initializer_list<VecTe>&);
+    vector &revice(const vector&);
+    vector &revice(vector&&);
+    
     VecTe  &operator[] (const ulong_t&);
     vector &operator= (const vector<VecTe>&);
     vector &operator= (vector<VecTe>&&) noexcept;

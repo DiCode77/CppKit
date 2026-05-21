@@ -339,6 +339,44 @@ dde::vector<VecTe> &dde::vector<VecTe>::swap(dde::vector<VecTe> &vec){
 }
 
 template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::revise(const dde::vector<VecTe>::ulong_t &in_size){
+    this->clear();
+    this->resize(in_size);
+    return *this;
+}
+
+template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::revice(const dde::vector<VecTe>::ulong_t &in_size, const VecTe &val){
+    this->clear();
+    this->resize(in_size, val);
+    return *this;
+}
+
+template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::revice(const std::initializer_list<VecTe> &list){
+    this->clear();
+    this->append_list(list);
+    return *this;
+}
+
+template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::revice(const vector<VecTe> &l_value){
+    this->clear();
+    this->reserve(l_value.capacity());
+    
+    for (ulong_t i = 0; i < l_value.size(); i++){
+        this->push_back(l_value);
+    }
+    return *this;
+}
+
+template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::revice(vector<VecTe> &&r_value){
+    this->swap(r_value);
+    return *this;
+}
+
+template <typename VecTe>
 VecTe &dde::vector<VecTe>::operator[] (const dde::vector<VecTe>::ulong_t &index){
     return this->at(index);
 }
