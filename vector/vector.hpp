@@ -94,6 +94,8 @@ public:
     template <typename Te>
     vector &run_func(Te&&);
     
+    vector &erase(const ulong_t&);
+    
     VecTe  &operator[] (const ulong_t&);
     vector &operator= (const vector<VecTe>&);
     vector &operator= (vector<VecTe>&&) noexcept;
