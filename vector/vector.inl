@@ -414,6 +414,26 @@ dde::vector<VecTe> &dde::vector<VecTe>::erase(const dde::vector<VecTe>::ulong_t 
 }
 
 template <typename VecTe>
+dde::vector<VecTe> &dde::vector<VecTe>::erase(const dde::vector<VecTe>::ulong_t &start, const dde::vector<VecTe>::ulong_t &end){
+    if (!this->empty() && start < this->size() && end <= this->size() && start <= end){
+        if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+            if (end < this->size()){
+                std::memmove(reinterpret_cast<void*>(this->stg->data + start), reinterpret_cast<void*>(this->stg->data + end), sizeof(VecTe) * (this->size() - end));
+                std::memset(reinterpret_cast<void*>(this->stg->data + this->size() - (end - start)), 0, sizeof(VecTe) * (end - start));
+            }
+        }else{
+            for (ulong_t i = start; (i +1) < this->size(); i++){
+                *(this->stg->data + i) = std::move(*(this->stg->data + (end + (i - start))));
+            }
+    
+            this->DestroyArray(this->stg->data + (this->size() - (end - start)), end - start);
+        }
+        
+    }
+    return *this;
+}
+
+template <typename VecTe>
 VecTe &dde::vector<VecTe>::operator[] (const dde::vector<VecTe>::ulong_t &index){
     return this->at(index);
 }
