@@ -27,7 +27,7 @@ constexpr bool IMPLICT_LIFETIME_TYPE = false;
 template <typename VecTe>
 class vector{
 public:
-    static constexpr const char *VEC_VERSION = "0.0.0-9b";
+    static constexpr const char *VEC_VERSION = "0.0.1";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;

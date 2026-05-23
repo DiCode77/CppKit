@@ -395,40 +395,24 @@ dde::vector<VecTe> &dde::vector<VecTe>::run_func(Te &&func){
 
 template <typename VecTe>
 dde::vector<VecTe> &dde::vector<VecTe>::erase(const dde::vector<VecTe>::ulong_t &pos){
-    if (!this->empty() && pos < this->size()){
-        this->DestroyArray(this->stg->data + pos, 1);
-
-        if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
-            if (pos +1 < this->size()){
-                std::memmove(reinterpret_cast<data_p_t>(this->stg->data + pos), reinterpret_cast<data_p_t>(this->stg->data + (pos +1)), sizeof(VecTe) * ((this->size() - pos) -1));
-                std::memset(reinterpret_cast<data_p_t>(this->stg->data + (this->size() -1)), 0, sizeof(VecTe));
-            }
-        }else{
-            for (ulong_t i = pos; i +1 < this->size(); i++){
-                *(this->stg->data +i) = std::move(*(this->stg->data +(i +1)));
-            }
-        }
-        this->stg->size--;
-    }
-    return *this;
+    return this->erase(pos, pos +1);
 }
 
 template <typename VecTe>
 dde::vector<VecTe> &dde::vector<VecTe>::erase(const dde::vector<VecTe>::ulong_t &start, const dde::vector<VecTe>::ulong_t &end){
-    if (!this->empty() && start < this->size() && end <= this->size() && start <= end){
-        if constexpr (std::is_trivially_default_constructible_v<VecTe> && std::is_trivially_copyable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
+    if (!this->empty() && start < end && end <= this->size()){
+        if constexpr (std::is_trivially_move_assignable_v<VecTe> && IMPLICT_LIFETIME_TYPE){
             if (end < this->size()){
                 std::memmove(reinterpret_cast<void*>(this->stg->data + start), reinterpret_cast<void*>(this->stg->data + end), sizeof(VecTe) * (this->size() - end));
-                std::memset(reinterpret_cast<void*>(this->stg->data + this->size() - (end - start)), 0, sizeof(VecTe) * (end - start));
             }
         }else{
-            for (ulong_t i = start; (i +1) < this->size(); i++){
-                *(this->stg->data + i) = std::move(*(this->stg->data + (end + (i - start))));
+            for (ulong_t i = end; i < this->size(); i++){
+                *(this->stg->data + (start + (i - end))) = std::move(*(this->stg->data + i));
             }
-    
             this->DestroyArray(this->stg->data + (this->size() - (end - start)), end - start);
         }
-        
+        std::memset(reinterpret_cast<void*>(this->stg->data + this->size() - (end - start)), 0, sizeof(VecTe) * (end - start));
+        this->stg->size -= end - start;
     }
     return *this;
 }
