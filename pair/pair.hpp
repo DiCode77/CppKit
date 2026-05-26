@@ -18,9 +18,20 @@ class pair{
     } *stg;
 public:
     pair() : stg(new Storage(Te_f{}, Te_s{})){}
-    pair(Te_f first, Te_s second) : pair(){
+    pair(const Te_f &first, const Te_s &second) : pair(){
         this->stg->first  = first;
         this->stg->second = second;
+    }
+    
+    pair(const pair &p) : pair(){
+        this->stg->first  = p.stg->first;
+        this->stg->second = p.stg->second;
+    }
+    
+    pair(pair &&p) : pair(){
+        Storage *_stg = p.stg;
+        p.stg = this->stg;
+        this->stg = _stg;
     }
     
     ~pair(){
