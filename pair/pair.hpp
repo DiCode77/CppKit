@@ -17,36 +17,21 @@ class pair{
         Te_s second;
     } *stg;
 public:
-    pair() : stg(new Storage(Te_f{}, Te_s{})){}
-    pair(const Te_f &first, const Te_s &second) : pair(){
-        this->stg->first  = first;
-        this->stg->second = second;
-    }
+    pair();
+    pair(const Te_f&, const Te_s&);
+    pair(const pair&);
+    pair(pair&&) noexcept;
+    ~pair();
     
-    pair(const pair &p) : pair(){
-        this->stg->first  = p.stg->first;
-        this->stg->second = p.stg->second;
-    }
+    Te_f &first();
+    Te_s &second();
+    pair &swap(pair &sw);
     
-    pair(pair &&p) : pair(){
-        Storage *_stg = p.stg;
-        p.stg = this->stg;
-        this->stg = _stg;
-    }
-    
-    ~pair(){
-        delete this->stg;
-    }
-    
-    Te_f &first(){
-        return this->stg->first;
-    }
-    
-    Te_s &second(){
-        return this->stg->second;
-    }
+    pair &operator= (const pair&);
+    pair &operator= (pair&&) noexcept;
 };
 
+#include "pair.inl"
 }
 
 #endif /* pair_hpp */
