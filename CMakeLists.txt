@@ -10,10 +10,11 @@ set(WEAR "${CMAKE_SOURCE_DIR}/weak_ptr")
 set(VERS "${CMAKE_SOURCE_DIR}/vers")
 set(VECR "${CMAKE_SOURCE_DIR}/vector")
 set(PAIR "${CMAKE_SOURCE_DIR}/pair")
+set(INIT_LIST "${CMAKE_SOURCE_DIR}/initializer_list")
 
 set(SRC "${CMAKE_SOURCE_DIR}/src")
 
-include_directories(${PROJECT_NAME} PRIVATE ${LIST} ${STRG} ${TEXT} ${UNIR} ${SHDR} ${WEAR} ${VERS} ${VECR} ${PAIR} ${SRC})
+include_directories(${PROJECT_NAME} PRIVATE ${LIST} ${STRG} ${TEXT} ${UNIR} ${SHDR} ${WEAR} ${VERS} ${VECR} ${PAIR} ${INIT_LIST} ${SRC})
 
 file(GLOB_RECURSE LIST_FILES "${LIST}/*.hpp" "${LIST}/*.inl")
 file(GLOB_RECURSE STRG_FILES "${STRG}/*.hpp" "${STRG}/*.cpp")
@@ -24,9 +25,10 @@ file(GLOB_RECURSE WEAR_FILES "${WEAR}/*.hpp" "${WEAR}/*.inl")
 file(GLOB_RECURSE VERS_FILES "${VERS}/*.hpp" "${VERS}/*.cpp")
 file(GLOB_RECURSE VECR_FILES "${VECR}/*.hpp" "${VECR}/*.inl")
 file(GLOB_RECURSE PAIR_FILES "${PAIR}/*.hpp" "${PAIR}/*.inl")
+file(GLOB_RECURSE INIT_LIST_FILES "${INIT_LIST}/*.hpp" "${INIT_LIST}/*.inl")
 file(GLOB_RECURSE SRC_FILES  "${SRC}/*.hpp" "${SRC}/*.cpp")
 
-add_executable(${PROJECT_NAME} ${LIST_FILES} ${STRG_FILES} ${TEXT_FILES} ${UNIR_FILES} ${SHDR_FILES} ${WEAR_FILES} ${VERS_FILES} ${VECR_FILES} ${PAIR_FILES} ${SRC_FILES})
+add_executable(${PROJECT_NAME} ${LIST_FILES} ${STRG_FILES} ${TEXT_FILES} ${UNIR_FILES} ${SHDR_FILES} ${WEAR_FILES} ${VERS_FILES} ${VECR_FILES} ${PAIR_FILES} ${INIT_LIST_FILES} ${SRC_FILES})
 
 source_group("list" FILES ${LIST_FILES})
 source_group("string" FILES ${STRG_FILES})
@@ -37,6 +39,7 @@ source_group("weak_ptr" FILES ${WEAR_FILES})
 source_group("vers" FILES ${VERS_FILES})
 source_group("vector" FILES ${VECR_FILES})
 source_group("pair" FILES ${PAIR_FILES})
+source_group("initializer_list" FILES ${INIT_LIST_FILES})
 source_group("src"  FILES ${SRC_FILES})
 
 set_target_properties(${PROJECT_NAME} PROPERTIES CXX_STANDARD 23 CXX_STANDARD_REQUIRED ON)
