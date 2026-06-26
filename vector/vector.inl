@@ -448,6 +448,26 @@ dde::vector<VecTe>::vector &dde::vector<VecTe>::operator= (const std::initialize
     return *this;
 }
 
+template <typename VecTe>
+dde::vector<VecTe>::iterator dde::vector<VecTe>::begin(){
+    return this->stg->data;
+}
+
+template <typename VecTe>
+dde::vector<VecTe>::iterator dde::vector<VecTe>::end(){
+    return this->stg->data + this->stg->size;
+}
+
+template <typename VecTe>
+dde::vector<VecTe>::const_iterator dde::vector<VecTe>::begin() const{
+    return this->stg->data;
+}
+
+template <typename VecTe>
+dde::vector<VecTe>::const_iterator dde::vector<VecTe>::end() const{
+    return this->stg->data + this->stg->size;
+}
+
 
 // Private methods
 
@@ -571,4 +591,79 @@ inline bool dde::vector<VecTe>::IsStorage() const{
 template <typename VecTe>
 inline bool dde::vector<VecTe>::IsStorageData() const{
     return this->stg->data != nullptr;
+}
+
+template <typename Te>
+dde::Iterator<Te>::Iterator() : m_data(nullptr){}
+
+template <typename Te>
+dde::Iterator<Te>::Iterator(Te *data) : dde::Iterator<Te>::Iterator(){
+    this->m_data = data;
+}
+
+template <typename Te>
+dde::Iterator<Te>::Iterator(const Iterator &l_iter) : dde::Iterator<Te>::Iterator(){
+    this->m_data = l_iter.m_data;
+}
+
+template <typename Te>
+dde::Iterator<Te>::Iterator(Iterator &&r_iter) : dde::Iterator<Te>::Iterator(){
+    this->m_data = r_iter.m_data;
+    r_iter.m_data = nullptr;
+}
+
+template <typename Te>
+dde::Iterator<Te>::~Iterator(){
+    this->m_data = nullptr;
+}
+
+template <typename Te>
+bool dde::Iterator<Te>::operator!= (const Iterator &iter){
+    return this->m_data != iter.m_data;
+}
+
+template <typename Te>
+bool dde::Iterator<Te>::operator== (const Iterator &iter){
+    return this->m_data == iter.m_data;
+}
+
+template <typename Te>
+dde::Iterator<Te> &dde::Iterator<Te>::operator++ (){
+    this->m_data++;
+    return *this;
+}
+
+template <typename Te>
+dde::Iterator<Te> dde::Iterator<Te>::operator++ (int){
+    Iterator it = *this;
+    this->m_data++;
+    return it;
+}
+
+template <typename Te>
+dde::Iterator<Te> &dde::Iterator<Te>::operator-- (){
+    this->m_data--;
+    return *this;
+}
+
+template <typename Te>
+dde::Iterator<Te> dde::Iterator<Te>::operator-- (int){
+    Iterator it = *this;
+    this->m_data--;
+    return it;
+}
+
+template <typename Te>
+Te &dde::Iterator<Te>::operator* (){
+    return *this->m_data;
+}
+
+template <typename Te>
+Te &dde::Iterator<Te>::operator-> (){
+    return *this->m_data;
+}
+
+template <typename Te>
+Te &dde::Iterator<Te>::get(){
+    return *this->m_data;
 }

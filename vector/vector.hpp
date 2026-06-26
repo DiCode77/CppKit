@@ -24,6 +24,9 @@ constexpr bool IMPLICT_LIFETIME_TYPE = true;
 constexpr bool IMPLICT_LIFETIME_TYPE = false;
 #endif
 
+template <typename>
+class Iterator;
+
 template <typename VecTe>
 class vector{
 public:
@@ -32,6 +35,9 @@ public:
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
     using c_vect_t = const VecTe;
+    using value_t  =  VecTe;
+    using iterator = Iterator<VecTe>;
+    using const_iterator = const Iterator<VecTe>;
 private:
     struct Storage{
         data_p_t data;
@@ -102,6 +108,11 @@ public:
     vector &operator= (vector<VecTe>&&) noexcept;
     vector &operator= (const std::initializer_list<VecTe>&);
     
+    iterator begin();
+    iterator end();
+    const_iterator begin() const;
+    const_iterator end() const;
+    
 private:
     Storage *CreateStorage(const data_p_t, const ulong_t, const ulong_t);
     template <typename Te> bool AppendToTheArray(data_p_t, const ulong_t&, Te&&);
@@ -112,6 +123,31 @@ private:
     void Destroy();
     inline bool IsStorage() const;
     inline bool IsStorageData() const;
+};
+
+template <typename Te>
+class Iterator{
+    Te *m_data;
+public:
+    Iterator();
+    Iterator(Te*);
+    Iterator(const Iterator&);
+    Iterator(Iterator&&);
+    ~Iterator();
+    
+    bool operator!= (const Iterator&);
+    bool operator== (const Iterator&);
+    
+    Iterator &operator++ ();
+    Iterator operator++ (int);
+    
+    Iterator &operator-- ();
+    Iterator operator-- (int);
+
+    Te &operator* ();
+    Te &operator-> ();
+    
+    Te &get();
 };
 
 }
