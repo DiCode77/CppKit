@@ -459,12 +459,12 @@ dde::vector<VecTe>::iterator dde::vector<VecTe>::end(){
 }
 
 template <typename VecTe>
-dde::vector<VecTe>::const_iterator dde::vector<VecTe>::begin() const{
+dde::vector<VecTe>::const_iterator dde::vector<VecTe>::cbegin() const{
     return this->stg->data;
 }
 
 template <typename VecTe>
-dde::vector<VecTe>::const_iterator dde::vector<VecTe>::end() const{
+dde::vector<VecTe>::const_iterator dde::vector<VecTe>::cend() const{
     return this->stg->data + this->stg->size;
 }
 
@@ -618,12 +618,12 @@ dde::Iterator<Te>::~Iterator(){
 }
 
 template <typename Te>
-bool dde::Iterator<Te>::operator!= (const Iterator &iter){
+bool dde::Iterator<Te>::operator!= (const Iterator &iter) const{
     return this->m_data != iter.m_data;
 }
 
 template <typename Te>
-bool dde::Iterator<Te>::operator== (const Iterator &iter){
+bool dde::Iterator<Te>::operator== (const Iterator &iter) const{
     return this->m_data == iter.m_data;
 }
 
@@ -654,13 +654,13 @@ dde::Iterator<Te> dde::Iterator<Te>::operator-- (int){
 }
 
 template <typename Te>
-Te &dde::Iterator<Te>::operator* (){
+Te &dde::Iterator<Te>::operator* () const{
     return *this->m_data;
 }
 
 template <typename Te>
-Te &dde::Iterator<Te>::operator-> (){
-    return *this->m_data;
+Te *dde::Iterator<Te>::operator-> (){
+    return this->m_data;
 }
 
 template <typename Te>

@@ -30,7 +30,7 @@ class Iterator;
 template <typename VecTe>
 class vector{
 public:
-    static constexpr const char *VEC_VERSION = "0.0.1";
+    static constexpr const char *VEC_VERSION = "0.0.2";
     
     using data_p_t = VecTe*;
     using ulong_t  = unsigned long;
@@ -110,8 +110,8 @@ public:
     
     iterator begin();
     iterator end();
-    const_iterator begin() const;
-    const_iterator end() const;
+    const_iterator cbegin() const;
+    const_iterator cend() const;
     
 private:
     Storage *CreateStorage(const data_p_t, const ulong_t, const ulong_t);
@@ -135,8 +135,8 @@ public:
     Iterator(Iterator&&);
     ~Iterator();
     
-    bool operator!= (const Iterator&);
-    bool operator== (const Iterator&);
+    bool operator!= (const Iterator&) const;
+    bool operator== (const Iterator&) const;
     
     Iterator &operator++ ();
     Iterator operator++ (int);
@@ -144,11 +144,18 @@ public:
     Iterator &operator-- ();
     Iterator operator-- (int);
 
-    Te &operator* ();
-    Te &operator-> ();
+    Te &operator* () const;
+    Te *operator-> ();
     
     Te &get();
 };
+
+template <typename Te>
+void advance(Iterator<Te> &&it, const size_t &inc){
+    for (size_t i = 0; i < inc; i++){
+        it++;
+    }
+}
 
 }
 
